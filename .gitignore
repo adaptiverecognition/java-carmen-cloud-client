@@ -1,0 +1,5 @@
+**/target/
+**/nb-configuration.xml
+**/nbactions.xml
+**/pom.xml.versionsBackup
+**/.flattened-pom.xml
