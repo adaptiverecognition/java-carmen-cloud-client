@@ -6,8 +6,8 @@ package com.adaptiverecognition.cloud.client;
 
 import com.adaptiverecognition.cloud.Request;
 import com.adaptiverecognition.cloud.Result;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 /**
  *
@@ -17,7 +17,37 @@ import java.util.concurrent.ExecutionException;
  */
 public interface ARCloudClient<R extends Request, A extends Result> {
 
-    public A process(R request) throws InterruptedException, ExecutionException;
+    /**
+     *
+     * @param request
+     * @return
+     * @throws ARCloudException
+     */
+    public A process(R request) throws ARCloudException;
 
-    public CompletableFuture<A> processAsync(R request);
+    /**
+     *
+     * @param request
+     * @param context
+     * @return
+     * @throws ARCloudException
+     */
+    public A process(R request, Map context) throws ARCloudException;
+
+    /**
+     *
+     * @param request
+     * @return
+     * @throws com.adaptiverecognition.cloud.client.ARCloudException
+     */
+    public CompletableFuture<A> processAsync(R request) throws ARCloudException;
+
+    /**
+     *
+     * @param request
+     * @param context
+     * @return
+     * @throws com.adaptiverecognition.cloud.client.ARCloudException
+     */
+    public CompletableFuture<A> processAsync(R request, Map context) throws ARCloudException;
 }
