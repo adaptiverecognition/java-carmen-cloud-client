@@ -1,8 +1,8 @@
-image: maven:3.6.3-jdk-11
+image: maven:3.8.5-jdk-11
 
 variables:
   MAVEN_CLI_OPTS: "--batch-mode --update-snapshots"
-  MAVEN_DEPLOYMENT_URL: "${env.CI_SERVER_URL}/api/v4/projects/${env.CI_PROJECT_ID}/packages/maven"
+  MAVEN_DEPLOYMENT_URL: "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/maven"
 
 cache:
   paths:
@@ -25,7 +25,7 @@ test:
 deploy:
   stage: deploy
   script:
-  - mvn $MAVEN_CLI_OPTS --activate-profiles default -DaltDeploymentRepository=snapshots::default::$MAVEN_DEPLOYMENT_URL deploy
+  - mvn $MAVEN_CLI_OPTS --activate-profiles default -DaltDeploymentRepository=gitlab-maven::default::$MAVEN_DEPLOYMENT_URL deploy
   before_script:
   - update-ca-certificates
   only:
@@ -35,7 +35,7 @@ release:
   stage: deploy
   script:
   - mvn versions:set -DgenerateBackupPoms=false -DnewVersion=$CI_COMMIT_TAG
-  - mvn $MAVEN_CLI_OPTS --activate-profiles production -DaltDeploymentRepository=central::default::$MAVEN_DEPLOYMENT_URL deploy
+  - mvn $MAVEN_CLI_OPTS --activate-profiles production -DaltDeploymentRepository=gitlab-maven::default::$MAVEN_DEPLOYMENT_URL deploy
   before_script:
   - update-ca-certificates
   rules:
