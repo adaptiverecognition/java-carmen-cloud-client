@@ -2,10 +2,7 @@ image: maven:3.6.3-jdk-11
 
 variables:
   MAVEN_CLI_OPTS: "--batch-mode --update-snapshots"
-  MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
-  MAVEN_REPO_URL: "http://192.168.254.97:8081/artifactory"
-  MAVEN_CENTRAL_REPO: "http://192.168.254.97:8081/artifactory/libs-release"
-  MAVEN_SNAPSHOTS_REPO: "http://192.168.254.97:8081/artifactory/libs-snapshot"
+  MAVEN_REPO_URL: "${env.CI_SERVER_URL}/api/v4/projects/${env.CI_PROJECT_ID}/packages/maven"
 
 cache:
   paths:
@@ -28,7 +25,9 @@ test:
 deploy:
   stage: deploy
   script:
-  - mvn $MAVEN_CLI_OPTS --activate-profiles default -DaltDeploymentRepository=snapshots::default::$MAVEN_SNAPSHOTS_REPO deploy
+  - mvn $MAVEN_CLI_OPTS --activate-profiles default -DaltDeploymentRepository=snapshots::default::$MAVEN_REPO_URL deploy
+  before_script:
+  - update-ca-certificates
   only:
   - develop
 
@@ -36,6 +35,8 @@ release:
   stage: deploy
   script:
   - mvn versions:set -DgenerateBackupPoms=false -DnewVersion=$CI_COMMIT_TAG
-  - mvn $MAVEN_CLI_OPTS --activate-profiles production -DaltDeploymentRepository=central::default::$MAVEN_CENTRAL_REPO deploy
+  - mvn $MAVEN_CLI_OPTS --activate-profiles production -DaltDeploymentRepository=central::default::$MAVEN_REPO_URL deploy
+  before_script:
+  - update-ca-certificates
   rules:
     - if: '$CI_COMMIT_TAG != null'
