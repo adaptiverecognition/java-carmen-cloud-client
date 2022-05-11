@@ -37,10 +37,12 @@ public class AnprClient implements ARCloudClient<AnprRequest, AnprResult> {
         this.retry = builder.retry.get();
 
         HttpClient httpClient = HttpClient.create().followRedirect(true);
+
         Long responseTimeout = builder.responseTimeout.get();
         if (responseTimeout != null) {
             httpClient = httpClient.responseTimeout(Duration.ofMillis(responseTimeout));
         }
+
         this.webClient = WebClient.builder()
                 .clientConnector(new ReactorClientHttpConnector(httpClient))
                 .baseUrl(builder.endpoint.get())
@@ -96,10 +98,12 @@ public class AnprClient implements ARCloudClient<AnprRequest, AnprResult> {
 
         MultipartBodyBuilder builder = new MultipartBodyBuilder();
         if (request.getServices() != null && !request.getServices().isEmpty()) {
-            builder.part("service", String.join(",", (List<String>) request.getServices().stream().map(s -> s.getValue()).collect(Collectors.toList())));
+            builder.part("service", String.join(",",
+                    (List<String>) request.getServices().stream().map(s -> s.getValue()).collect(Collectors.toList())));
         }
         if (request.getImageSource() != null) {
-            builder.part("image", new ByteArrayResource(request.getImageSource()), MediaType.parseMediaType("image/" + request.getImageMimeType()))
+            builder.part("image", new ByteArrayResource(request.getImageSource()),
+                    MediaType.parseMediaType("image/" + request.getImageMimeType()))
                     .filename(request.getImageName());
         }
         if (request.getLocation() != null) {
