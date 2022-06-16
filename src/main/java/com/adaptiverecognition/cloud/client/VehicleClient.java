@@ -4,8 +4,6 @@
  */
 package com.adaptiverecognition.cloud.client;
 
-import com.adaptiverecognition.cloud.anpr.AnprRequest;
-import com.adaptiverecognition.cloud.anpr.AnprResult;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +17,10 @@ import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
+
+import com.adaptiverecognition.cloud.vehicle.VehicleRequest;
+import com.adaptiverecognition.cloud.vehicle.VehicleResult;
+
 import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
 import reactor.util.context.Context;
@@ -28,12 +30,12 @@ import reactor.util.retry.RetryBackoffSpec;
  *
  * @author laszlo.toth
  */
-public class AnprClient implements ARCloudClient<AnprRequest, AnprResult> {
+public class VehicleClient implements ARCloudClient<VehicleRequest, VehicleResult> {
 
     private final RetryBackoffSpec retry;
     private final WebClient webClient;
 
-    private AnprClient(AnprClientBuilder builder) {
+    private VehicleClient(VehicleClientBuilder builder) {
         this.retry = builder.retry.get();
 
         HttpClient httpClient = HttpClient.create().followRedirect(true);
@@ -58,7 +60,7 @@ public class AnprClient implements ARCloudClient<AnprRequest, AnprResult> {
      * @throws ARCloudException
      */
     @Override
-    public AnprResult process(AnprRequest request) throws ARCloudException {
+    public VehicleResult process(VehicleRequest request) throws ARCloudException {
         return process(request, null);
     }
 
@@ -70,7 +72,7 @@ public class AnprClient implements ARCloudClient<AnprRequest, AnprResult> {
      * @throws ARCloudException
      */
     @Override
-    public AnprResult process(AnprRequest request, Map context) throws ARCloudException {
+    public VehicleResult process(VehicleRequest request, Map context) throws ARCloudException {
         try {
             return processAsync(request, context).get();
         } catch (InterruptedException | ExecutionException e) {
@@ -84,7 +86,7 @@ public class AnprClient implements ARCloudClient<AnprRequest, AnprResult> {
      * @return
      */
     @Override
-    public CompletableFuture<AnprResult> processAsync(AnprRequest request) throws ARCloudException {
+    public CompletableFuture<VehicleResult> processAsync(VehicleRequest request) throws ARCloudException {
         return processAsync(request, null);
     }
 
@@ -94,7 +96,7 @@ public class AnprClient implements ARCloudClient<AnprRequest, AnprResult> {
      * @return
      */
     @Override
-    public CompletableFuture<AnprResult> processAsync(AnprRequest request, Map context) throws ARCloudException {
+    public CompletableFuture<VehicleResult> processAsync(VehicleRequest request, Map context) throws ARCloudException {
 
         MultipartBodyBuilder builder = new MultipartBodyBuilder();
         if (request.getServices() != null && !request.getServices().isEmpty()) {
@@ -122,7 +124,7 @@ public class AnprClient implements ARCloudClient<AnprRequest, AnprResult> {
             region = request.getRegion();
         }
 
-        Mono<AnprResult> result = webClient.post()
+        Mono<VehicleResult> result = webClient.post()
                 .uri(region)
                 .accept(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromMultipartData(builder.build()))
@@ -137,7 +139,7 @@ public class AnprClient implements ARCloudClient<AnprRequest, AnprResult> {
                         return Mono.error(new ARCloudException(response.statusCode().value(), error));
                     });
                 })
-                .bodyToMono(AnprResult.class);
+                .bodyToMono(VehicleResult.class);
 
         if (retry != null) {
             result = result.retryWhen(context != null ? retry.withRetryContext(Context.of(context)) : retry);
@@ -149,15 +151,15 @@ public class AnprClient implements ARCloudClient<AnprRequest, AnprResult> {
     /**
      *
      */
-    public static class AnprClientBuilder extends ARCloudClientBuilder<AnprClientBuilder, AnprClient> {
+    public static class VehicleClientBuilder extends ARCloudClientBuilder<VehicleClientBuilder, VehicleClient> {
 
         /**
          *
          * @return
          */
         @Override
-        public AnprClient build() {
-            return new AnprClient(this);
+        public VehicleClient build() {
+            return new VehicleClient(this);
         }
     }
 

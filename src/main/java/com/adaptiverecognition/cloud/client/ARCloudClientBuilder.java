@@ -47,8 +47,8 @@ public abstract class ARCloudClientBuilder<B extends ARCloudClientBuilder, C ext
      *
      * @return
      */
-    public static AnprClient.AnprClientBuilder anprClientBuilder() {
-        return new AnprClient.AnprClientBuilder();
+    public static VehicleClient.VehicleClientBuilder anprClientBuilder() {
+        return new VehicleClient.VehicleClientBuilder();
     }
 
     /**
