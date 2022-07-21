@@ -30,7 +30,7 @@ import reactor.util.retry.RetryBackoffSpec;
  *
  * @author laszlo.toth
  */
-public class VehicleClient implements ARCloudClient<VehicleRequest, VehicleResult> {
+public class VehicleClient implements ARCloudClient<VehicleRequest<VehicleRequest.Service>, VehicleResult> {
 
     private final RetryBackoffSpec retry;
     private final WebClient webClient;
@@ -60,7 +60,7 @@ public class VehicleClient implements ARCloudClient<VehicleRequest, VehicleResul
      * @throws ARCloudException
      */
     @Override
-    public VehicleResult process(VehicleRequest request) throws ARCloudException {
+    public VehicleResult process(VehicleRequest<VehicleRequest.Service> request) throws ARCloudException {
         return process(request, null);
     }
 
@@ -72,7 +72,7 @@ public class VehicleClient implements ARCloudClient<VehicleRequest, VehicleResul
      * @throws ARCloudException
      */
     @Override
-    public VehicleResult process(VehicleRequest request, Map context) throws ARCloudException {
+    public VehicleResult process(VehicleRequest<VehicleRequest.Service> request, Map context) throws ARCloudException {
         try {
             return processAsync(request, context).get();
         } catch (InterruptedException | ExecutionException e) {
@@ -86,7 +86,8 @@ public class VehicleClient implements ARCloudClient<VehicleRequest, VehicleResul
      * @return
      */
     @Override
-    public CompletableFuture<VehicleResult> processAsync(VehicleRequest request) throws ARCloudException {
+    public CompletableFuture<VehicleResult> processAsync(VehicleRequest<VehicleRequest.Service> request)
+            throws ARCloudException {
         return processAsync(request, null);
     }
 
@@ -96,7 +97,8 @@ public class VehicleClient implements ARCloudClient<VehicleRequest, VehicleResul
      * @return
      */
     @Override
-    public CompletableFuture<VehicleResult> processAsync(VehicleRequest request, Map context) throws ARCloudException {
+    public CompletableFuture<VehicleResult> processAsync(VehicleRequest<VehicleRequest.Service> request, Map context)
+            throws ARCloudException {
 
         MultipartBodyBuilder builder = new MultipartBodyBuilder();
         if (request.getServices() != null && !request.getServices().isEmpty()) {
