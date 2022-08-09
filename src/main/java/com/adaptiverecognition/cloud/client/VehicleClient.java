@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
+
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -49,7 +50,10 @@ public class VehicleClient implements ARCloudClient<VehicleRequest<VehicleReques
                 .clientConnector(new ReactorClientHttpConnector(httpClient))
                 .baseUrl(builder.endpoint.get())
                 .defaultHeader("Content-Type", MediaType.MULTIPART_FORM_DATA_VALUE)
-                .defaultHeader("X-Api-Key", builder.apiKey.get())
+                .defaultHeader("X-Api-Key", builder.apiKey())
+                .defaultHeader("X-Disable-Call-Statistics", String.valueOf(builder.disableCallStatistics()))
+                .defaultHeader("X-Disable-Image-Resizing", String.valueOf(builder.disableImageResizing()))
+                .defaultHeader("X-Enable-Wide-Range-Analysis", String.valueOf(builder.enableWideRangeAnalysis()))
                 .build();
     }
 

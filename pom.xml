@@ -4,7 +4,7 @@
     <artifactId>cloud-client</artifactId>
     <packaging>jar</packaging>
     <name>AR Cloud Client</name>
-    <version>1.0-SNAPSHOT</version>
+    <version>3.6-SNAPSHOT</version>
     <description>Client package for AR Cloud</description>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
