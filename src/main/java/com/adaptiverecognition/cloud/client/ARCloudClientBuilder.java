@@ -70,7 +70,7 @@ public abstract class ARCloudClientBuilder<R extends Request, A extends Result> 
      *
      * @return
      */
-    public static VehicleClient.VehicleClientBuilder anprClientBuilder() {
+    public static VehicleClient.VehicleClientBuilder vehicleClientBuilder() {
         return new VehicleClient.VehicleClientBuilder();
     }
 
