@@ -4,7 +4,7 @@
     <artifactId>cloud-client</artifactId>
     <packaging>jar</packaging>
     <name>AR Cloud Client</name>
-    <version>3.6-SNAPSHOT</version>
+    <version>3.7-SNAPSHOT</version>
     <description>Client package for AR Cloud</description>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -36,7 +36,7 @@
                 <dependency>
                     <groupId>com.adaptiverecognition</groupId>
                     <artifactId>cloud-api</artifactId>
-                    <version>3.6-SNAPSHOT</version>
+                    <version>3.7-SNAPSHOT</version>
                 </dependency>
             </dependencies>
         </profile>
@@ -46,7 +46,7 @@
                 <dependency>
                     <groupId>com.adaptiverecognition</groupId>
                     <artifactId>cloud-api</artifactId>
-                    <version>3.6</version>
+                    <version>3.7</version>
                 </dependency>
             </dependencies>
         </profile>

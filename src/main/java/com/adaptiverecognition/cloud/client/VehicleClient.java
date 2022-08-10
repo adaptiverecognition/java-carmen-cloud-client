@@ -157,7 +157,8 @@ public class VehicleClient implements ARCloudClient<VehicleRequest<VehicleReques
     /**
      *
      */
-    public static class VehicleClientBuilder extends ARCloudClientBuilder<VehicleClientBuilder, VehicleClient> {
+    public static class VehicleClientBuilder
+            extends ARCloudClientBuilder<VehicleRequest<VehicleRequest.Service>, VehicleResult> {
 
         /**
          *

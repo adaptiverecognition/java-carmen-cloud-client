@@ -8,16 +8,19 @@ import java.time.Duration;
 
 import org.springframework.web.reactive.function.client.WebClientRequestException;
 
+import com.adaptiverecognition.cloud.Request;
+import com.adaptiverecognition.cloud.Result;
+
 import reactor.util.retry.Retry;
 import reactor.util.retry.RetryBackoffSpec;
 
 /**
  *
  * @author laszlo.toth
- * @param <B>
- * @param <C>
+ * @param <R>
+ * @param <A>
  */
-public abstract class ARCloudClientBuilder<B extends ARCloudClientBuilder, C extends ARCloudClient> {
+public abstract class ARCloudClientBuilder<R extends Request, A extends Result> {
 
     /**
      *
@@ -32,29 +35,17 @@ public abstract class ARCloudClientBuilder<B extends ARCloudClientBuilder, C ext
     /**
      *
      */
-    protected final ThreadLocal<Boolean> disableCallStatistics = new ThreadLocal<>() {
-        {
-            set(false);
-        }
-    };
+    protected final ThreadLocal<Boolean> disableCallStatistics = new ThreadLocal<>();
 
     /**
      *
      */
-    protected final ThreadLocal<Boolean> disableImageResizing = new ThreadLocal<>() {
-        {
-            set(false);
-        }
-    };;
+    protected final ThreadLocal<Boolean> disableImageResizing = new ThreadLocal<>();
 
     /**
      *
      */
-    protected final ThreadLocal<Boolean> enableWideRangeAnalysis = new ThreadLocal<>() {
-        {
-            set(false);
-        }
-    };;
+    protected final ThreadLocal<Boolean> enableWideRangeAnalysis = new ThreadLocal<>();
 
     /**
      *
@@ -70,6 +61,9 @@ public abstract class ARCloudClientBuilder<B extends ARCloudClientBuilder, C ext
      *
      */
     protected ARCloudClientBuilder() {
+        this.disableCallStatistics.set(false);
+        this.disableImageResizing.set(false);
+        this.enableWideRangeAnalysis.set(false);
     }
 
     /**
@@ -85,9 +79,9 @@ public abstract class ARCloudClientBuilder<B extends ARCloudClientBuilder, C ext
      * @param endpoint
      * @return
      */
-    public B endpoint(String endpoint) {
+    public ARCloudClientBuilder<R, A> endpoint(String endpoint) {
         this.endpoint.set(endpoint);
-        return (B) this;
+        return (ARCloudClientBuilder<R, A>) this;
     }
 
     /**
@@ -103,9 +97,9 @@ public abstract class ARCloudClientBuilder<B extends ARCloudClientBuilder, C ext
      * @param apiKey
      * @return
      */
-    public B apiKey(String apiKey) {
+    public ARCloudClientBuilder<R, A> apiKey(String apiKey) {
         this.apiKey.set(apiKey);
-        return (B) this;
+        return (ARCloudClientBuilder<R, A>) this;
     }
 
     /**
@@ -121,9 +115,9 @@ public abstract class ARCloudClientBuilder<B extends ARCloudClientBuilder, C ext
      * @param disableCallStatistics
      * @return
      */
-    public B disableCallStatistics(boolean disableCallStatistics) {
+    public ARCloudClientBuilder<R, A> disableCallStatistics(boolean disableCallStatistics) {
         this.disableCallStatistics.set(disableCallStatistics);
-        return (B) this;
+        return (ARCloudClientBuilder<R, A>) this;
     }
 
     /**
@@ -139,9 +133,9 @@ public abstract class ARCloudClientBuilder<B extends ARCloudClientBuilder, C ext
      * @param disableImageResizing
      * @return
      */
-    public B disableImageResizing(boolean disableImageResizing) {
+    public ARCloudClientBuilder<R, A> disableImageResizing(boolean disableImageResizing) {
         this.disableImageResizing.set(disableImageResizing);
-        return (B) this;
+        return (ARCloudClientBuilder<R, A>) this;
     }
 
     /**
@@ -157,9 +151,9 @@ public abstract class ARCloudClientBuilder<B extends ARCloudClientBuilder, C ext
      * @param enableWideRangeAnalysis
      * @return
      */
-    public B enableWideRangeAnalysis(boolean enableWideRangeAnalysis) {
+    public ARCloudClientBuilder<R, A> enableWideRangeAnalysis(boolean enableWideRangeAnalysis) {
         this.enableWideRangeAnalysis.set(enableWideRangeAnalysis);
-        return (B) this;
+        return (ARCloudClientBuilder<R, A>) this;
     }
 
     /**
@@ -175,9 +169,9 @@ public abstract class ARCloudClientBuilder<B extends ARCloudClientBuilder, C ext
      * @param responseTimeout
      * @return
      */
-    public B responseTimeout(Long responseTimeout) {
+    public ARCloudClientBuilder<R, A> responseTimeout(Long responseTimeout) {
         this.responseTimeout.set(responseTimeout);
-        return (B) this;
+        return (ARCloudClientBuilder<R, A>) this;
     }
 
     /**
@@ -193,9 +187,9 @@ public abstract class ARCloudClientBuilder<B extends ARCloudClientBuilder, C ext
      * @param retry
      * @return
      */
-    public B retry(RetryBackoffSpec retry) {
+    public ARCloudClientBuilder<R, A> retry(RetryBackoffSpec retry) {
         this.retry.set(retry);
-        return (B) this;
+        return (ARCloudClientBuilder<R, A>) this;
     }
 
     /**
@@ -227,6 +221,6 @@ public abstract class ARCloudClientBuilder<B extends ARCloudClientBuilder, C ext
      *
      * @return
      */
-    public abstract C build();
+    public abstract ARCloudClient<R, A> build();
 
 }
