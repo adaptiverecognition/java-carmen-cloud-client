@@ -76,7 +76,8 @@ public class VehicleClient implements ARCloudClient<VehicleRequest<VehicleReques
      * @throws ARCloudException
      */
     @Override
-    public VehicleResult process(VehicleRequest<VehicleRequest.Service> request, Map context) throws ARCloudException {
+    public VehicleResult process(VehicleRequest<VehicleRequest.Service> request, Map<?, ?> context)
+            throws ARCloudException {
         try {
             return processAsync(request, context).get();
         } catch (InterruptedException | ExecutionException e) {
@@ -101,7 +102,8 @@ public class VehicleClient implements ARCloudClient<VehicleRequest<VehicleReques
      * @return
      */
     @Override
-    public CompletableFuture<VehicleResult> processAsync(VehicleRequest<VehicleRequest.Service> request, Map context)
+    public CompletableFuture<VehicleResult> processAsync(VehicleRequest<VehicleRequest.Service> request,
+            Map<?, ?> context)
             throws ARCloudException {
 
         MultipartBodyBuilder builder = new MultipartBodyBuilder();

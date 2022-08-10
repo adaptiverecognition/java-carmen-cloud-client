@@ -32,7 +32,7 @@ public interface ARCloudClient<R extends Request, A extends Result> {
      * @return
      * @throws ARCloudException
      */
-    public A process(R request, Map context) throws ARCloudException;
+    public A process(R request, Map<?, ?> context) throws ARCloudException;
 
     /**
      *
@@ -49,5 +49,5 @@ public interface ARCloudClient<R extends Request, A extends Result> {
      * @return
      * @throws com.adaptiverecognition.cloud.client.ARCloudException
      */
-    public CompletableFuture<A> processAsync(R request, Map context) throws ARCloudException;
+    public CompletableFuture<A> processAsync(R request, Map<?, ?> context) throws ARCloudException;
 }
