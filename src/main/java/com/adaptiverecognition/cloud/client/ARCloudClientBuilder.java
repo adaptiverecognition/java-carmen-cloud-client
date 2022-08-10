@@ -81,7 +81,7 @@ public abstract class ARCloudClientBuilder<R extends Request, A extends Result> 
      */
     public ARCloudClientBuilder<R, A> endpoint(String endpoint) {
         this.endpoint.set(endpoint);
-        return (ARCloudClientBuilder<R, A>) this;
+        return this;
     }
 
     /**
@@ -99,7 +99,7 @@ public abstract class ARCloudClientBuilder<R extends Request, A extends Result> 
      */
     public ARCloudClientBuilder<R, A> apiKey(String apiKey) {
         this.apiKey.set(apiKey);
-        return (ARCloudClientBuilder<R, A>) this;
+        return this;
     }
 
     /**
@@ -117,7 +117,7 @@ public abstract class ARCloudClientBuilder<R extends Request, A extends Result> 
      */
     public ARCloudClientBuilder<R, A> disableCallStatistics(boolean disableCallStatistics) {
         this.disableCallStatistics.set(disableCallStatistics);
-        return (ARCloudClientBuilder<R, A>) this;
+        return this;
     }
 
     /**
@@ -135,7 +135,7 @@ public abstract class ARCloudClientBuilder<R extends Request, A extends Result> 
      */
     public ARCloudClientBuilder<R, A> disableImageResizing(boolean disableImageResizing) {
         this.disableImageResizing.set(disableImageResizing);
-        return (ARCloudClientBuilder<R, A>) this;
+        return this;
     }
 
     /**
@@ -153,7 +153,7 @@ public abstract class ARCloudClientBuilder<R extends Request, A extends Result> 
      */
     public ARCloudClientBuilder<R, A> enableWideRangeAnalysis(boolean enableWideRangeAnalysis) {
         this.enableWideRangeAnalysis.set(enableWideRangeAnalysis);
-        return (ARCloudClientBuilder<R, A>) this;
+        return this;
     }
 
     /**
@@ -171,7 +171,7 @@ public abstract class ARCloudClientBuilder<R extends Request, A extends Result> 
      */
     public ARCloudClientBuilder<R, A> responseTimeout(Long responseTimeout) {
         this.responseTimeout.set(responseTimeout);
-        return (ARCloudClientBuilder<R, A>) this;
+        return this;
     }
 
     /**
@@ -189,7 +189,7 @@ public abstract class ARCloudClientBuilder<R extends Request, A extends Result> 
      */
     public ARCloudClientBuilder<R, A> retry(RetryBackoffSpec retry) {
         this.retry.set(retry);
-        return (ARCloudClientBuilder<R, A>) this;
+        return this;
     }
 
     /**

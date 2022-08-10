@@ -5,7 +5,6 @@
 package com.adaptiverecognition.cloud.client;
 
 import java.time.Duration;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -20,6 +19,7 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.adaptiverecognition.cloud.vehicle.VehicleRequest;
+import com.adaptiverecognition.cloud.vehicle.VehicleRequest.Service;
 import com.adaptiverecognition.cloud.vehicle.VehicleResult;
 
 import reactor.core.publisher.Mono;
@@ -107,7 +107,7 @@ public class VehicleClient implements ARCloudClient<VehicleRequest<VehicleReques
         MultipartBodyBuilder builder = new MultipartBodyBuilder();
         if (request.getServices() != null && !request.getServices().isEmpty()) {
             builder.part("service", String.join(",",
-                    (List<String>) request.getServices().stream().map(s -> s.getValue()).collect(Collectors.toList())));
+                    request.getServices().stream().map(Service::getValue).collect(Collectors.toList())));
         }
         if (request.getImageSource() != null) {
             builder.part("image", new ByteArrayResource(request.getImageSource()),
@@ -135,16 +135,12 @@ public class VehicleClient implements ARCloudClient<VehicleRequest<VehicleReques
                 .accept(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromMultipartData(builder.build()))
                 .retrieve()
-                .onStatus(HttpStatus::is4xxClientError, response -> {
-                    return response.bodyToMono(String.class).flatMap(error -> {
-                        return Mono.error(new ARCloudException(response.statusCode().value(), error));
-                    });
-                })
-                .onStatus(HttpStatus::is5xxServerError, response -> {
-                    return response.bodyToMono(String.class).flatMap(error -> {
-                        return Mono.error(new ARCloudException(response.statusCode().value(), error));
-                    });
-                })
+                .onStatus(HttpStatus::is4xxClientError,
+                        response -> response.bodyToMono(String.class).flatMap(
+                                error -> Mono.error(new ARCloudException(response.statusCode().value(), error))))
+                .onStatus(HttpStatus::is5xxServerError,
+                        response -> response.bodyToMono(String.class).flatMap(
+                                error -> Mono.error(new ARCloudException(response.statusCode().value(), error))))
                 .bodyToMono(VehicleResult.class);
 
         if (retry != null) {
