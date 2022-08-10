@@ -81,6 +81,8 @@ public class VehicleClient implements ARCloudClient<VehicleRequest<VehicleReques
         try {
             return processAsync(request, context).get();
         } catch (InterruptedException | ExecutionException e) {
+            // Restore interrupted state...
+            Thread.currentThread().interrupt();
             throw new ARCloudException(500, e.getMessage(), e);
         }
     }
