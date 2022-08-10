@@ -158,10 +158,41 @@ public class VehicleClient implements ARCloudClient<VehicleRequest<VehicleReques
     public static class VehicleClientBuilder
             extends ARCloudClientBuilder<VehicleRequest<VehicleRequest.Service>, VehicleResult> {
 
-        /**
-         *
-         * @return
-         */
+        @Override
+        public VehicleClientBuilder endpoint(String endpoint) {
+            return (VehicleClientBuilder) super.endpoint(endpoint);
+        }
+
+        @Override
+        public VehicleClientBuilder apiKey(String apiKey) {
+            return (VehicleClientBuilder) super.apiKey(apiKey);
+        }
+
+        @Override
+        public VehicleClientBuilder disableCallStatistics(boolean disableCallStatistics) {
+            return (VehicleClientBuilder) super.disableCallStatistics(disableCallStatistics);
+        }
+
+        @Override
+        public VehicleClientBuilder disableImageResizing(boolean disableImageResizing) {
+            return (VehicleClientBuilder) super.disableImageResizing(disableImageResizing);
+        }
+
+        @Override
+        public VehicleClientBuilder enableWideRangeAnalysis(boolean enableWideRangeAnalysis) {
+            return (VehicleClientBuilder) super.enableWideRangeAnalysis(enableWideRangeAnalysis);
+        }
+
+        @Override
+        public VehicleClientBuilder responseTimeout(Long responseTimeout) {
+            return (VehicleClientBuilder) super.responseTimeout(responseTimeout);
+        }
+
+        @Override
+        public VehicleClientBuilder retry(RetryBackoffSpec retry) {
+            return (VehicleClientBuilder) super.retry(retry);
+        }
+
         @Override
         public VehicleClient build() {
             return new VehicleClient(this);
