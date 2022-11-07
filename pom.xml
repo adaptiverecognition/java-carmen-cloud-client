@@ -4,7 +4,7 @@
     <artifactId>cloud-client</artifactId>
     <packaging>jar</packaging>
     <name>AR Cloud Client</name>
-    <version>3.7-SNAPSHOT</version>
+    <version>3.7.2-SNAPSHOT</version>
     <description>Client package for AR Cloud</description>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -25,7 +25,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.2.2</version>
+                <version>3.3.0</version>
             </plugin>
         </plugins>
     </build>
@@ -36,7 +36,7 @@
                 <dependency>
                     <groupId>com.adaptiverecognition</groupId>
                     <artifactId>cloud-api</artifactId>
-                    <version>3.7-SNAPSHOT</version>
+                    <version>3.7.2-SNAPSHOT</version>
                 </dependency>
             </dependencies>
         </profile>
@@ -46,7 +46,7 @@
                 <dependency>
                     <groupId>com.adaptiverecognition</groupId>
                     <artifactId>cloud-api</artifactId>
-                    <version>3.7</version>
+                    <version>3.7.2</version>
                 </dependency>
             </dependencies>
         </profile>
@@ -55,7 +55,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>
-            <version>2.6.4</version>
+            <version>2.7.5</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.springframework.boot</groupId>
@@ -66,12 +66,12 @@
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-tcnative-boringssl-static</artifactId>
-            <version>2.0.51.Final</version>
+            <version>2.0.54.Final</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-log4j2</artifactId>
-            <version>2.6.4</version>
+            <version>2.7.5</version>
         </dependency>
         <dependency>
             <groupId>com.lmax</groupId>
@@ -81,12 +81,12 @@
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-api</artifactId>
-            <version>2.18.0</version>
+            <version>2.19.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
-            <version>2.18.0</version>
+            <version>2.19.0</version>
         </dependency>
     </dependencies>
 </project>
