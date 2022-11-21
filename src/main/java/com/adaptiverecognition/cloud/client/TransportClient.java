@@ -8,7 +8,6 @@ import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -21,9 +20,8 @@ import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import com.adaptiverecognition.cloud.vehicle.VehicleRequest;
-import com.adaptiverecognition.cloud.vehicle.VehicleRequest.Service;
-import com.adaptiverecognition.cloud.vehicle.VehicleResult;
+import com.adaptiverecognition.cloud.transport.TransportRequest;
+import com.adaptiverecognition.cloud.transport.TransportResult;
 
 import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
@@ -34,14 +32,14 @@ import reactor.util.retry.RetryBackoffSpec;
  *
  * @author laszlo.toth
  */
-public class VehicleClient implements ARCloudClient<VehicleRequest<?>, VehicleResult> {
+public class TransportClient implements ARCloudClient<TransportRequest<?>, TransportResult> {
 
-    private static final Logger LOGGER = LogManager.getLogger(VehicleClient.class);
+    private static final Logger LOGGER = LogManager.getLogger(TransportClient.class);
 
     private final RetryBackoffSpec retry;
     private final WebClient webClient;
 
-    private VehicleClient(VehicleClientBuilder builder) {
+    private TransportClient(TransportClientBuilder builder) {
         this.retry = builder.retry.get();
 
         HttpClient httpClient = HttpClient.create().followRedirect(true);
@@ -56,7 +54,6 @@ public class VehicleClient implements ARCloudClient<VehicleRequest<?>, VehicleRe
                 .baseUrl(builder.endpoint.get())
                 .defaultHeader("Content-Type", MediaType.MULTIPART_FORM_DATA_VALUE)
                 .defaultHeader("X-Api-Key", builder.apiKey())
-                .defaultHeader("X-Disable-Call-Statistics", String.valueOf(builder.disableCallStatistics()))
                 .defaultHeader("X-Disable-Image-Resizing", String.valueOf(builder.disableImageResizing()))
                 .defaultHeader("X-Enable-Wide-Range-Analysis", String.valueOf(builder.enableWideRangeAnalysis()))
                 .build();
@@ -69,7 +66,7 @@ public class VehicleClient implements ARCloudClient<VehicleRequest<?>, VehicleRe
      * @throws ARCloudException
      */
     @Override
-    public VehicleResult process(VehicleRequest<?> request) throws ARCloudException {
+    public TransportResult process(TransportRequest<?> request) throws ARCloudException {
         return process(request, null);
     }
 
@@ -81,7 +78,8 @@ public class VehicleClient implements ARCloudClient<VehicleRequest<?>, VehicleRe
      * @throws ARCloudException
      */
     @Override
-    public VehicleResult process(VehicleRequest<?> request, Map<?, ?> context)
+    public TransportResult process(
+            TransportRequest<?> request, Map<?, ?> context)
             throws ARCloudException {
         try {
             return processAsync(request, context).get();
@@ -98,7 +96,8 @@ public class VehicleClient implements ARCloudClient<VehicleRequest<?>, VehicleRe
      * @return
      */
     @Override
-    public CompletableFuture<VehicleResult> processAsync(VehicleRequest<?> request)
+    public CompletableFuture<TransportResult> processAsync(
+            TransportRequest<?> request)
             throws ARCloudException {
         return processAsync(request, null);
     }
@@ -109,38 +108,30 @@ public class VehicleClient implements ARCloudClient<VehicleRequest<?>, VehicleRe
      * @return
      */
     @Override
-    public CompletableFuture<VehicleResult> processAsync(VehicleRequest<?> request,
+    public CompletableFuture<TransportResult> processAsync(
+            TransportRequest<?> request,
             Map<?, ?> context)
             throws ARCloudException {
 
         MultipartBodyBuilder builder = new MultipartBodyBuilder();
-        if (request.getServices() != null && !request.getServices().isEmpty()) {
-            builder.part("service", String.join(",",
-                    request.getServices().stream().map(Service::getValue).collect(Collectors.toList())));
-        }
-        if (request.getInputImage() != null) {
-            builder.part("image", new ByteArrayResource(request.getInputImage().getImageSource()),
-                    MediaType.parseMediaType("image/" + request.getInputImage().getImageMimeType()))
-                    .filename(request.getInputImage().getImageName());
-        }
-        if (request.getLocation() != null) {
-            builder.part("location", request.getLocation());
-        }
-        if (request.getMaxreads() != null) {
-            builder.part("maxreads", request.getMaxreads());
+        if (request.getInputImages() != null) {
+            request.getInputImages().forEach(inputImage -> builder
+                    .part("image", new ByteArrayResource(inputImage.getImageSource()),
+                            MediaType.parseMediaType("image/" + inputImage.getImageMimeType()))
+                    .filename(inputImage.getImageName()));
         }
 
-        String region;
-        if (request.getRegion() == null || request.getRegion().length() == 0) {
-            region = "";
-        } else if (!request.getRegion().startsWith("/")) {
-            region = "/" + request.getRegion();
+        String type;
+        if (request.getType() == null || request.getType().length() == 0) {
+            type = "";
+        } else if (!request.getType().startsWith("/")) {
+            type = "/" + request.getType();
         } else {
-            region = request.getRegion();
+            type = request.getType();
         }
 
-        Mono<VehicleResult> result = webClient.post()
-                .uri(region)
+        Mono<TransportResult> result = webClient.post()
+                .uri(type)
                 .accept(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromMultipartData(builder.build()))
                 .retrieve()
@@ -164,7 +155,7 @@ public class VehicleClient implements ARCloudClient<VehicleRequest<?>, VehicleRe
                                     }
                                     return Mono.error(new ARCloudException(response.statusCode().value(), error));
                                 }))
-                .bodyToMono(VehicleResult.class);
+                .bodyToMono(TransportResult.class);
 
         if (retry != null) {
             result = result.retryWhen(context != null ? retry.withRetryContext(Context.of(context)) : retry);
@@ -176,13 +167,8 @@ public class VehicleClient implements ARCloudClient<VehicleRequest<?>, VehicleRe
     /**
      *
      */
-    public static class VehicleClientBuilder
-            extends ARCloudClientBuilder<VehicleRequest<?>, VehicleResult> {
-
-        /**
-         *
-         */
-        private final ThreadLocal<Boolean> disableCallStatistics = new ThreadLocal<>();
+    public static class TransportClientBuilder
+            extends ARCloudClientBuilder<TransportRequest<?>, TransportResult> {
 
         /**
          *
@@ -194,48 +180,29 @@ public class VehicleClient implements ARCloudClient<VehicleRequest<?>, VehicleRe
          */
         private final ThreadLocal<Boolean> enableWideRangeAnalysis = new ThreadLocal<>();
 
-        public VehicleClientBuilder() {
-            this.disableCallStatistics.set(false);
+        public TransportClientBuilder() {
             this.disableImageResizing.set(false);
             this.enableWideRangeAnalysis.set(false);
         }
 
         @Override
-        public VehicleClientBuilder endpoint(String endpoint) {
-            return (VehicleClientBuilder) super.endpoint(endpoint);
+        public TransportClientBuilder endpoint(String endpoint) {
+            return (TransportClientBuilder) super.endpoint(endpoint);
         }
 
         @Override
-        public VehicleClientBuilder apiKey(String apiKey) {
-            return (VehicleClientBuilder) super.apiKey(apiKey);
+        public TransportClientBuilder apiKey(String apiKey) {
+            return (TransportClientBuilder) super.apiKey(apiKey);
         }
 
         @Override
-        public VehicleClientBuilder responseTimeout(Long responseTimeout) {
-            return (VehicleClientBuilder) super.responseTimeout(responseTimeout);
+        public TransportClientBuilder responseTimeout(Long responseTimeout) {
+            return (TransportClientBuilder) super.responseTimeout(responseTimeout);
         }
 
         @Override
-        public VehicleClientBuilder retry(RetryBackoffSpec retry) {
-            return (VehicleClientBuilder) super.retry(retry);
-        }
-
-        /**
-         *
-         * @param disableCallStatistics
-         * @return
-         */
-        public VehicleClientBuilder disableCallStatistics(boolean disableCallStatistics) {
-            this.disableCallStatistics.set(disableCallStatistics);
-            return this;
-        }
-
-        /**
-         *
-         * @return
-         */
-        public boolean disableCallStatistics() {
-            return this.disableCallStatistics.get();
+        public TransportClientBuilder retry(RetryBackoffSpec retry) {
+            return (TransportClientBuilder) super.retry(retry);
         }
 
         /**
@@ -243,7 +210,7 @@ public class VehicleClient implements ARCloudClient<VehicleRequest<?>, VehicleRe
          * @param disableImageResizing
          * @return
          */
-        public VehicleClientBuilder disableImageResizing(boolean disableImageResizing) {
+        public TransportClientBuilder disableImageResizing(boolean disableImageResizing) {
             this.disableImageResizing.set(disableImageResizing);
             return this;
         }
@@ -261,7 +228,7 @@ public class VehicleClient implements ARCloudClient<VehicleRequest<?>, VehicleRe
          * @param enableWideRangeAnalysis
          * @return
          */
-        public VehicleClientBuilder enableWideRangeAnalysis(boolean enableWideRangeAnalysis) {
+        public TransportClientBuilder enableWideRangeAnalysis(boolean enableWideRangeAnalysis) {
             this.enableWideRangeAnalysis.set(enableWideRangeAnalysis);
             return this;
         }
@@ -275,8 +242,8 @@ public class VehicleClient implements ARCloudClient<VehicleRequest<?>, VehicleRe
         }
 
         @Override
-        public VehicleClient build() {
-            return new VehicleClient(this);
+        public TransportClient build() {
+            return new TransportClient(this);
         }
     }
 

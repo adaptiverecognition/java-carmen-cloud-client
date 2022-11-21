@@ -35,36 +35,12 @@ public abstract class ARCloudClientBuilder<R extends Request, A extends Result> 
     /**
      *
      */
-    protected final ThreadLocal<Boolean> disableCallStatistics = new ThreadLocal<>();
-
-    /**
-     *
-     */
-    protected final ThreadLocal<Boolean> disableImageResizing = new ThreadLocal<>();
-
-    /**
-     *
-     */
-    protected final ThreadLocal<Boolean> enableWideRangeAnalysis = new ThreadLocal<>();
-
-    /**
-     *
-     */
     protected final ThreadLocal<Long> responseTimeout = new ThreadLocal<>();
 
     /**
      *
      */
     protected final ThreadLocal<RetryBackoffSpec> retry = new ThreadLocal<>();
-
-    /**
-     *
-     */
-    protected ARCloudClientBuilder() {
-        this.disableCallStatistics.set(false);
-        this.disableImageResizing.set(false);
-        this.enableWideRangeAnalysis.set(false);
-    }
 
     /**
      *
@@ -108,60 +84,6 @@ public abstract class ARCloudClientBuilder<R extends Request, A extends Result> 
      */
     public String apiKey() {
         return this.apiKey.get();
-    }
-
-    /**
-     *
-     * @param disableCallStatistics
-     * @return
-     */
-    public ARCloudClientBuilder<R, A> disableCallStatistics(boolean disableCallStatistics) {
-        this.disableCallStatistics.set(disableCallStatistics);
-        return this;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public boolean disableCallStatistics() {
-        return this.disableCallStatistics.get();
-    }
-
-    /**
-     *
-     * @param disableImageResizing
-     * @return
-     */
-    public ARCloudClientBuilder<R, A> disableImageResizing(boolean disableImageResizing) {
-        this.disableImageResizing.set(disableImageResizing);
-        return this;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public boolean disableImageResizing() {
-        return this.disableImageResizing.get();
-    }
-
-    /**
-     *
-     * @param enableWideRangeAnalysis
-     * @return
-     */
-    public ARCloudClientBuilder<R, A> enableWideRangeAnalysis(boolean enableWideRangeAnalysis) {
-        this.enableWideRangeAnalysis.set(enableWideRangeAnalysis);
-        return this;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public boolean enableWideRangeAnalysis() {
-        return this.enableWideRangeAnalysis.get();
     }
 
     /**
