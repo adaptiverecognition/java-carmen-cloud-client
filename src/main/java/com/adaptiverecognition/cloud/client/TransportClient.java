@@ -56,6 +56,9 @@ public class TransportClient implements ARCloudClient<TransportRequest<?>, Trans
                 .defaultHeader("X-Api-Key", builder.apiKey())
                 .defaultHeader("X-Disable-Image-Resizing", String.valueOf(builder.disableImageResizing()))
                 .defaultHeader("X-Enable-Wide-Range-Analysis", String.valueOf(builder.enableWideRangeAnalysis()))
+                .defaultHeader("X-Disable-Checksum-Check", String.valueOf(builder.disableChecksumCheck()))
+                .defaultHeader("X-Enable-Full-Us-Accr-Code", String.valueOf(builder.enableFullUsAccrCode()))
+                .defaultHeader("X-Disable-Iso-Code", String.valueOf(builder.disableIsoCode()))
                 .build();
     }
 
@@ -180,9 +183,27 @@ public class TransportClient implements ARCloudClient<TransportRequest<?>, Trans
          */
         private final ThreadLocal<Boolean> enableWideRangeAnalysis = new ThreadLocal<>();
 
+        /**
+         *
+         */
+        private final ThreadLocal<Boolean> disableChecksumCheck = new ThreadLocal<>();
+
+        /**
+        *
+        */
+        private final ThreadLocal<Boolean> enableFullUsAccrCode = new ThreadLocal<>();
+
+        /**
+         *
+         */
+        private final ThreadLocal<Boolean> disableIsoCode = new ThreadLocal<>();
+
         public TransportClientBuilder() {
             this.disableImageResizing.set(false);
             this.enableWideRangeAnalysis.set(false);
+            this.disableChecksumCheck.set(false);
+            this.enableFullUsAccrCode.set(false);
+            this.disableIsoCode.set(false);
         }
 
         @Override
@@ -239,6 +260,60 @@ public class TransportClient implements ARCloudClient<TransportRequest<?>, Trans
          */
         public boolean enableWideRangeAnalysis() {
             return this.enableWideRangeAnalysis.get();
+        }
+
+        /**
+         *
+         * @param disableChecksumCheck
+         * @return
+         */
+        public TransportClientBuilder disableChecksumCheck(boolean disableChecksumCheck) {
+            this.disableChecksumCheck.set(disableChecksumCheck);
+            return this;
+        }
+
+        /**
+         *
+         * @return
+         */
+        public boolean disableChecksumCheck() {
+            return this.disableChecksumCheck.get();
+        }
+
+        /**
+         *
+         * @param enableFullUsAccrCode
+         * @return
+         */
+        public TransportClientBuilder enableFullUsAccrCode(boolean enableFullUsAccrCode) {
+            this.enableFullUsAccrCode.set(enableFullUsAccrCode);
+            return this;
+        }
+
+        /**
+         *
+         * @return
+         */
+        public boolean enableFullUsAccrCode() {
+            return this.enableFullUsAccrCode.get();
+        }
+
+        /**
+         *
+         * @param disableIsoCode
+         * @return
+         */
+        public TransportClientBuilder disableIsoCode(boolean disableIsoCode) {
+            this.disableIsoCode.set(disableIsoCode);
+            return this;
+        }
+
+        /**
+         *
+         * @return
+         */
+        public boolean disableIsoCode() {
+            return this.disableIsoCode.get();
         }
 
         @Override
