@@ -20,7 +20,7 @@ import reactor.util.retry.RetryBackoffSpec;
  * @param <R>
  * @param <A>
  */
-public abstract class ARCloudClientBuilder<R extends Request, A extends Result> {
+public abstract class ARCloudClientBuilder<R extends Request<?>, A extends Result> {
 
     /**
      *

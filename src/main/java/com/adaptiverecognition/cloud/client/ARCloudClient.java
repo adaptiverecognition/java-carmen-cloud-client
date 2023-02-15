@@ -15,7 +15,7 @@ import java.util.concurrent.CompletableFuture;
  * @param <R>
  * @param <A>
  */
-public interface ARCloudClient<R extends Request, A extends Result> {
+public interface ARCloudClient<R extends Request<?>, A extends Result> {
 
     /**
      *
