@@ -51,10 +51,8 @@ public class VehicleClient implements ARCloudClient<VehicleRequest<?>, VehicleRe
             httpClient = httpClient.responseTimeout(Duration.ofMillis(responseTimeout));
         }
 
-        this.webClient = WebClient.builder()
-                .clientConnector(new ReactorClientHttpConnector(httpClient))
-                .baseUrl(builder.endpoint.get())
-                .defaultHeader("Content-Type", MediaType.MULTIPART_FORM_DATA_VALUE)
+        this.webClient = WebClient.builder().clientConnector(new ReactorClientHttpConnector(httpClient))
+                .baseUrl(builder.endpoint.get()).defaultHeader("Content-Type", MediaType.MULTIPART_FORM_DATA_VALUE)
                 .defaultHeader("X-Api-Key", builder.apiKey())
                 .defaultHeader("X-Disable-Call-Statistics", String.valueOf(builder.disableCallStatistics()))
                 .defaultHeader("X-Disable-Image-Resizing", String.valueOf(builder.disableImageResizing()))
@@ -81,8 +79,7 @@ public class VehicleClient implements ARCloudClient<VehicleRequest<?>, VehicleRe
      * @throws ARCloudException
      */
     @Override
-    public VehicleResult process(VehicleRequest<?> request, Map<?, ?> context)
-            throws ARCloudException {
+    public VehicleResult process(VehicleRequest<?> request, Map<?, ?> context) throws ARCloudException {
         try {
             return processAsync(request, context).get();
         } catch (InterruptedException | ExecutionException e) {
@@ -98,8 +95,7 @@ public class VehicleClient implements ARCloudClient<VehicleRequest<?>, VehicleRe
      * @return
      */
     @Override
-    public CompletableFuture<VehicleResult> processAsync(VehicleRequest<?> request)
-            throws ARCloudException {
+    public CompletableFuture<VehicleResult> processAsync(VehicleRequest<?> request) throws ARCloudException {
         return processAsync(request, null);
     }
 
@@ -109,8 +105,7 @@ public class VehicleClient implements ARCloudClient<VehicleRequest<?>, VehicleRe
      * @return
      */
     @Override
-    public CompletableFuture<VehicleResult> processAsync(VehicleRequest<?> request,
-            Map<?, ?> context)
+    public CompletableFuture<VehicleResult> processAsync(VehicleRequest<?> request, Map<?, ?> context)
             throws ARCloudException {
 
         MultipartBodyBuilder builder = new MultipartBodyBuilder();
@@ -126,6 +121,9 @@ public class VehicleClient implements ARCloudClient<VehicleRequest<?>, VehicleRe
         if (request.getLocation() != null) {
             builder.part("location", request.getLocation());
         }
+        if (request.getRoi() != null) {
+            builder.part("roi", request.getRoi());
+        }
         if (request.getMaxreads() != null) {
             builder.part("maxreads", request.getMaxreads());
         }
@@ -139,32 +137,22 @@ public class VehicleClient implements ARCloudClient<VehicleRequest<?>, VehicleRe
             region = request.getRegion();
         }
 
-        Mono<VehicleResult> result = webClient.post()
-                .uri(region)
-                .accept(MediaType.APPLICATION_JSON)
-                .body(BodyInserters.fromMultipartData(builder.build()))
-                .retrieve()
-                .onStatus(HttpStatus::is4xxClientError,
-                        response -> response.bodyToMono(String.class).flatMap(
-                                error -> {
-                                    if (LOGGER.isDebugEnabled()) {
-                                        LOGGER.log(Level.DEBUG, "4xx error occured: {} ({} - {})", error,
-                                                response.statusCode(),
-                                                response.rawStatusCode());
-                                    }
-                                    return Mono.error(new ARCloudException(response.statusCode().value(), error));
-                                }))
-                .onStatus(HttpStatus::is5xxServerError,
-                        response -> response.bodyToMono(String.class).flatMap(
-                                error -> {
-                                    if (LOGGER.isDebugEnabled()) {
-                                        LOGGER.log(Level.DEBUG, "5xx error occured: {} ({} - {})", error,
-                                                response.statusCode(),
-                                                response.rawStatusCode());
-                                    }
-                                    return Mono.error(new ARCloudException(response.statusCode().value(), error));
-                                }))
-                .bodyToMono(VehicleResult.class);
+        Mono<VehicleResult> result = webClient.post().uri(region).accept(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromMultipartData(builder.build())).retrieve()
+                .onStatus(HttpStatus::is4xxClientError, response -> response.bodyToMono(String.class).flatMap(error -> {
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.log(Level.DEBUG, "4xx error occured: {} ({} - {})", error, response.statusCode(),
+                                response.rawStatusCode());
+                    }
+                    return Mono.error(new ARCloudException(response.statusCode().value(), error));
+                }))
+                .onStatus(HttpStatus::is5xxServerError, response -> response.bodyToMono(String.class).flatMap(error -> {
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.log(Level.DEBUG, "5xx error occured: {} ({} - {})", error, response.statusCode(),
+                                response.rawStatusCode());
+                    }
+                    return Mono.error(new ARCloudException(response.statusCode().value(), error));
+                })).bodyToMono(VehicleResult.class);
 
         if (retry != null) {
             result = result.retryWhen(context != null ? retry.withRetryContext(Context.of(context)) : retry);
@@ -176,8 +164,7 @@ public class VehicleClient implements ARCloudClient<VehicleRequest<?>, VehicleRe
     /**
      *
      */
-    public static class VehicleClientBuilder
-            extends ARCloudClientBuilder<VehicleRequest<?>, VehicleResult> {
+    public static class VehicleClientBuilder extends ARCloudClientBuilder<VehicleRequest<?>, VehicleResult> {
 
         /**
          *
