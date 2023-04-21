@@ -8,6 +8,7 @@ import java.time.Duration;
 
 import org.springframework.web.reactive.function.client.WebClientRequestException;
 
+import com.adaptiverecognition.cloud.ARCloudException;
 import com.adaptiverecognition.cloud.Request;
 import com.adaptiverecognition.cloud.Result;
 

@@ -6,7 +6,7 @@
     <artifactId>cloud-client</artifactId>
     <packaging>jar</packaging>
     <name>AR Cloud Client</name>
-    <version>4.1-SNAPSHOT</version>
+    <version>4.2-SNAPSHOT</version>
     <description>Client package for AR Cloud</description>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -38,7 +38,7 @@
                 <dependency>
                     <groupId>com.adaptiverecognition</groupId>
                     <artifactId>cloud-api</artifactId>
-                    <version>4.1-SNAPSHOT</version>
+                    <version>4.2-SNAPSHOT</version>
                 </dependency>
             </dependencies>
         </profile>
@@ -48,7 +48,7 @@
                 <dependency>
                     <groupId>com.adaptiverecognition</groupId>
                     <artifactId>cloud-api</artifactId>
-                    <version>4.1</version>
+                    <version>4.2</version>
                 </dependency>
             </dependencies>
         </profile>
@@ -57,7 +57,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>
-            <version>2.7.9</version>
+            <version>2.7.11</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.springframework.boot</groupId>
@@ -73,7 +73,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-log4j2</artifactId>
-            <version>2.7.9</version>
+            <version>2.7.11</version>
         </dependency>
         <dependency>
             <groupId>com.lmax</groupId>

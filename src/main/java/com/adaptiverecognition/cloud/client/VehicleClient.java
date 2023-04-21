@@ -5,6 +5,7 @@
 package com.adaptiverecognition.cloud.client;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -13,6 +14,7 @@ import java.util.stream.Collectors;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -21,6 +23,9 @@ import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import com.adaptiverecognition.cloud.ARCloudException;
+import com.adaptiverecognition.cloud.vehicle.Locations;
+import com.adaptiverecognition.cloud.vehicle.Locations.Location;
 import com.adaptiverecognition.cloud.vehicle.VehicleRequest;
 import com.adaptiverecognition.cloud.vehicle.VehicleRequest.Service;
 import com.adaptiverecognition.cloud.vehicle.VehicleResult;
@@ -62,13 +67,76 @@ public class VehicleClient implements ARCloudClient<VehicleRequest<?>, VehicleRe
 
     /**
      *
+     * @return
+     * @throws ARCloudException
+     */
+    public Locations getLocations() throws ARCloudException {
+        return getLocations(null);
+    }
+
+    /**
+     *
+     * @param context
+     * @return
+     * @throws ARCloudException
+     */
+    public Locations getLocations(Map<?, ?> context) throws ARCloudException {
+        try {
+            return getLocationsAsync(context).get();
+        } catch (InterruptedException | ExecutionException e) {
+            // Restore interrupted state...
+            Thread.currentThread().interrupt();
+            if (e.getCause() instanceof ARCloudException) {
+                throw (ARCloudException) e.getCause();
+            } else {
+                throw new ARCloudException(500, e.getMessage(), e);
+            }
+
+        }
+    }
+
+    /**
+     *
+     * @return
+     */
+    public CompletableFuture<Locations> getLocationsAsync() {
+        return getLocationsAsync(null);
+    }
+
+    /**
+     *
+     * @param context
+     * @return
+     */
+    public CompletableFuture<Locations> getLocationsAsync(Map<?, ?> context) {
+        ParameterizedTypeReference<List<Location>> ptr = new ParameterizedTypeReference<>() {
+        };
+
+        Mono<Locations> result = webClient.get().uri("countries").accept(MediaType.APPLICATION_JSON).retrieve()
+                .onStatus(HttpStatus::is5xxServerError, response -> response.bodyToMono(String.class).flatMap(error -> {
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.log(Level.DEBUG, "5xx error occured: {} ({} - {})", error, response.statusCode(),
+                                response.rawStatusCode());
+                    }
+                    return Mono.error(new ARCloudException(response.statusCode().value(), error));
+                })).bodyToMono(ptr).flatMap(locations -> Mono.just(new Locations(locations)));
+
+        if (retry != null) {
+            result = result.retryWhen(context != null ? retry.withRetryContext(Context.of(context)) : retry);
+        }
+
+        return result.toFuture();
+    }
+
+    /**
+     *
      * @param request
      * @return
      * @throws ARCloudException
      */
     @Override
-    public VehicleResult process(VehicleRequest<?> request) throws ARCloudException {
-        return process(request, null);
+    public VehicleResult search(VehicleRequest<?> request) throws ARCloudException {
+        return search(request, null);
     }
 
     /**
@@ -79,13 +147,18 @@ public class VehicleClient implements ARCloudClient<VehicleRequest<?>, VehicleRe
      * @throws ARCloudException
      */
     @Override
-    public VehicleResult process(VehicleRequest<?> request, Map<?, ?> context) throws ARCloudException {
+    public VehicleResult search(VehicleRequest<?> request, Map<?, ?> context) throws ARCloudException {
         try {
-            return processAsync(request, context).get();
+            return searchAsync(request, context).get();
         } catch (InterruptedException | ExecutionException e) {
             // Restore interrupted state...
             Thread.currentThread().interrupt();
-            throw new ARCloudException(500, e.getMessage(), e);
+            if (e.getCause() instanceof ARCloudException) {
+                throw (ARCloudException) e.getCause();
+            } else {
+                throw new ARCloudException(500, e.getMessage(), e);
+            }
+
         }
     }
 
@@ -95,18 +168,18 @@ public class VehicleClient implements ARCloudClient<VehicleRequest<?>, VehicleRe
      * @return
      */
     @Override
-    public CompletableFuture<VehicleResult> processAsync(VehicleRequest<?> request) throws ARCloudException {
-        return processAsync(request, null);
+    public CompletableFuture<VehicleResult> searchAsync(VehicleRequest<?> request) {
+        return searchAsync(request, null);
     }
 
     /**
      *
      * @param request
+     * @param context
      * @return
      */
     @Override
-    public CompletableFuture<VehicleResult> processAsync(VehicleRequest<?> request, Map<?, ?> context)
-            throws ARCloudException {
+    public CompletableFuture<VehicleResult> searchAsync(VehicleRequest<?> request, Map<?, ?> context) {
 
         MultipartBodyBuilder builder = new MultipartBodyBuilder();
         if (request.getServices() != null && !request.getServices().isEmpty()) {
@@ -144,7 +217,7 @@ public class VehicleClient implements ARCloudClient<VehicleRequest<?>, VehicleRe
                         LOGGER.log(Level.DEBUG, "4xx error occured: {} ({} - {})", error, response.statusCode(),
                                 response.rawStatusCode());
                     }
-                    return Mono.error(new ARCloudException(response.statusCode().value(), error));
+                    return Mono.error(new ARCloudException(response.rawStatusCode(), error));
                 }))
                 .onStatus(HttpStatus::is5xxServerError, response -> response.bodyToMono(String.class).flatMap(error -> {
                     if (LOGGER.isDebugEnabled()) {
@@ -152,7 +225,13 @@ public class VehicleClient implements ARCloudClient<VehicleRequest<?>, VehicleRe
                                 response.rawStatusCode());
                     }
                     return Mono.error(new ARCloudException(response.statusCode().value(), error));
-                })).bodyToMono(VehicleResult.class);
+                })).toEntity(VehicleResult.class).flatMap(entity -> {
+                    VehicleResult vr = entity.getBody();
+                    if (vr != null) {
+                        vr.setRequestId(entity.getHeaders().getFirst("x-amzn-requestid"));
+                    }
+                    return Mono.justOrEmpty(vr);
+                });
 
         if (retry != null) {
             result = result.retryWhen(context != null ? retry.withRetryContext(Context.of(context)) : retry);

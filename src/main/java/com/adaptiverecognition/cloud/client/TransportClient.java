@@ -20,6 +20,7 @@ import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import com.adaptiverecognition.cloud.ARCloudException;
 import com.adaptiverecognition.cloud.transport.TransportRequest;
 import com.adaptiverecognition.cloud.transport.TransportResult;
 
@@ -49,17 +50,14 @@ public class TransportClient implements ARCloudClient<TransportRequest<?>, Trans
             httpClient = httpClient.responseTimeout(Duration.ofMillis(responseTimeout));
         }
 
-        this.webClient = WebClient.builder()
-                .clientConnector(new ReactorClientHttpConnector(httpClient))
-                .baseUrl(builder.endpoint.get())
-                .defaultHeader("Content-Type", MediaType.MULTIPART_FORM_DATA_VALUE)
+        this.webClient = WebClient.builder().clientConnector(new ReactorClientHttpConnector(httpClient))
+                .baseUrl(builder.endpoint.get()).defaultHeader("Content-Type", MediaType.MULTIPART_FORM_DATA_VALUE)
                 .defaultHeader("X-Api-Key", builder.apiKey())
                 .defaultHeader("X-Disable-Image-Resizing", String.valueOf(builder.disableImageResizing()))
                 .defaultHeader("X-Enable-Wide-Range-Analysis", String.valueOf(builder.enableWideRangeAnalysis()))
                 .defaultHeader("X-Disable-Checksum-Check", String.valueOf(builder.disableChecksumCheck()))
                 .defaultHeader("X-Enable-Full-Us-Accr-Code", String.valueOf(builder.enableFullUsAccrCode()))
-                .defaultHeader("X-Disable-Iso-Code", String.valueOf(builder.disableIsoCode()))
-                .build();
+                .defaultHeader("X-Disable-Iso-Code", String.valueOf(builder.disableIsoCode())).build();
     }
 
     /**
@@ -69,8 +67,8 @@ public class TransportClient implements ARCloudClient<TransportRequest<?>, Trans
      * @throws ARCloudException
      */
     @Override
-    public TransportResult process(TransportRequest<?> request) throws ARCloudException {
-        return process(request, null);
+    public TransportResult search(TransportRequest<?> request) throws ARCloudException {
+        return search(request, null);
     }
 
     /**
@@ -81,11 +79,9 @@ public class TransportClient implements ARCloudClient<TransportRequest<?>, Trans
      * @throws ARCloudException
      */
     @Override
-    public TransportResult process(
-            TransportRequest<?> request, Map<?, ?> context)
-            throws ARCloudException {
+    public TransportResult search(TransportRequest<?> request, Map<?, ?> context) throws ARCloudException {
         try {
-            return processAsync(request, context).get();
+            return searchAsync(request, context).get();
         } catch (InterruptedException | ExecutionException e) {
             // Restore interrupted state...
             Thread.currentThread().interrupt();
@@ -99,10 +95,8 @@ public class TransportClient implements ARCloudClient<TransportRequest<?>, Trans
      * @return
      */
     @Override
-    public CompletableFuture<TransportResult> processAsync(
-            TransportRequest<?> request)
-            throws ARCloudException {
-        return processAsync(request, null);
+    public CompletableFuture<TransportResult> searchAsync(TransportRequest<?> request) throws ARCloudException {
+        return searchAsync(request, null);
     }
 
     /**
@@ -111,17 +105,16 @@ public class TransportClient implements ARCloudClient<TransportRequest<?>, Trans
      * @return
      */
     @Override
-    public CompletableFuture<TransportResult> processAsync(
-            TransportRequest<?> request,
-            Map<?, ?> context)
+    public CompletableFuture<TransportResult> searchAsync(TransportRequest<?> request, Map<?, ?> context)
             throws ARCloudException {
 
         MultipartBodyBuilder builder = new MultipartBodyBuilder();
         if (request.getInputImages() != null) {
-            request.getInputImages().forEach(inputImage -> builder
-                    .part("image", new ByteArrayResource(inputImage.getImageSource()),
-                            MediaType.parseMediaType("image/" + inputImage.getImageMimeType()))
-                    .filename(inputImage.getImageName()));
+            request.getInputImages()
+                    .forEach(inputImage -> builder
+                            .part("image", new ByteArrayResource(inputImage.getImageSource()),
+                                    MediaType.parseMediaType("image/" + inputImage.getImageMimeType()))
+                            .filename(inputImage.getImageName()));
         }
 
         String type;
@@ -133,32 +126,28 @@ public class TransportClient implements ARCloudClient<TransportRequest<?>, Trans
             type = request.getType();
         }
 
-        Mono<TransportResult> result = webClient.post()
-                .uri(type)
-                .accept(MediaType.APPLICATION_JSON)
-                .body(BodyInserters.fromMultipartData(builder.build()))
-                .retrieve()
-                .onStatus(HttpStatus::is4xxClientError,
-                        response -> response.bodyToMono(String.class).flatMap(
-                                error -> {
-                                    if (LOGGER.isDebugEnabled()) {
-                                        LOGGER.log(Level.DEBUG, "4xx error occured: {} ({} - {})", error,
-                                                response.statusCode(),
-                                                response.rawStatusCode());
-                                    }
-                                    return Mono.error(new ARCloudException(response.statusCode().value(), error));
-                                }))
-                .onStatus(HttpStatus::is5xxServerError,
-                        response -> response.bodyToMono(String.class).flatMap(
-                                error -> {
-                                    if (LOGGER.isDebugEnabled()) {
-                                        LOGGER.log(Level.DEBUG, "5xx error occured: {} ({} - {})", error,
-                                                response.statusCode(),
-                                                response.rawStatusCode());
-                                    }
-                                    return Mono.error(new ARCloudException(response.statusCode().value(), error));
-                                }))
-                .bodyToMono(TransportResult.class);
+        Mono<TransportResult> result = webClient.post().uri(type).accept(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromMultipartData(builder.build())).retrieve()
+                .onStatus(HttpStatus::is4xxClientError, response -> response.bodyToMono(String.class).flatMap(error -> {
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.log(Level.DEBUG, "4xx error occured: {} ({} - {})", error, response.statusCode(),
+                                response.rawStatusCode());
+                    }
+                    return Mono.error(new ARCloudException(response.statusCode().value(), error));
+                }))
+                .onStatus(HttpStatus::is5xxServerError, response -> response.bodyToMono(String.class).flatMap(error -> {
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.log(Level.DEBUG, "5xx error occured: {} ({} - {})", error, response.statusCode(),
+                                response.rawStatusCode());
+                    }
+                    return Mono.error(new ARCloudException(response.statusCode().value(), error));
+                })).toEntity(TransportResult.class).flatMap(entity -> {
+                    TransportResult vr = entity.getBody();
+                    if (vr != null) {
+                        vr.setRequestId(entity.getHeaders().getFirst("x-amzn-requestid"));
+                    }
+                    return Mono.justOrEmpty(vr);
+                });
 
         if (retry != null) {
             result = result.retryWhen(context != null ? retry.withRetryContext(Context.of(context)) : retry);
@@ -170,8 +159,7 @@ public class TransportClient implements ARCloudClient<TransportRequest<?>, Trans
     /**
      *
      */
-    public static class TransportClientBuilder
-            extends ARCloudClientBuilder<TransportRequest<?>, TransportResult> {
+    public static class TransportClientBuilder extends ARCloudClientBuilder<TransportRequest<?>, TransportResult> {
 
         /**
          *
