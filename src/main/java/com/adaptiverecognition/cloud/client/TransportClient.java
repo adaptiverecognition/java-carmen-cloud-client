@@ -128,20 +128,21 @@ public class TransportClient implements ARCloudClient<TransportRequest<?>, Trans
 
         Mono<TransportResult> result = webClient.post().uri(type).accept(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromMultipartData(builder.build())).retrieve()
-                .onStatus(HttpStatus::is4xxClientError, response -> response.bodyToMono(String.class).flatMap(error -> {
-                    if (LOGGER.isDebugEnabled()) {
-                        LOGGER.log(Level.DEBUG, "4xx error occured: {} ({} - {})", error, response.statusCode(),
-                                response.rawStatusCode());
-                    }
-                    return Mono.error(new ARCloudException(response.statusCode().value(), error));
-                }))
-                .onStatus(HttpStatus::is5xxServerError, response -> response.bodyToMono(String.class).flatMap(error -> {
-                    if (LOGGER.isDebugEnabled()) {
-                        LOGGER.log(Level.DEBUG, "5xx error occured: {} ({} - {})", error, response.statusCode(),
-                                response.rawStatusCode());
-                    }
-                    return Mono.error(new ARCloudException(response.statusCode().value(), error));
-                })).toEntity(TransportResult.class).flatMap(entity -> {
+                .onStatus(statusCode -> statusCode.is4xxClientError(),
+                        response -> response.bodyToMono(String.class).flatMap(error -> {
+                            if (LOGGER.isDebugEnabled()) {
+                                LOGGER.log(Level.DEBUG, "4xx error occured: {} ({})", error, response.statusCode());
+                            }
+                            return Mono.error(new ARCloudException(response.statusCode().value(), error));
+                        }))
+                .onStatus(statusCode -> statusCode.is5xxServerError(),
+                        response -> response.bodyToMono(String.class).flatMap(error -> {
+                            if (LOGGER.isDebugEnabled()) {
+                                LOGGER.log(Level.DEBUG, "5xx error occured: {} ({})", error, response.statusCode());
+                            }
+                            return Mono.error(new ARCloudException(response.statusCode().value(), error));
+                        }))
+                .toEntity(TransportResult.class).flatMap(entity -> {
                     TransportResult vr = entity.getBody();
                     if (vr != null) {
                         vr.setRequestId(entity.getHeaders().getFirst("x-amzn-requestid"));

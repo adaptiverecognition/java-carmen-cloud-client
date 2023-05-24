@@ -113,13 +113,14 @@ public class VehicleClient implements ARCloudClient<VehicleRequest<?>, VehicleRe
         };
 
         Mono<Locations> result = webClient.get().uri("countries").accept(MediaType.APPLICATION_JSON).retrieve()
-                .onStatus(HttpStatus::is5xxServerError, response -> response.bodyToMono(String.class).flatMap(error -> {
-                    if (LOGGER.isDebugEnabled()) {
-                        LOGGER.log(Level.DEBUG, "5xx error occured: {} ({} - {})", error, response.statusCode(),
-                                response.rawStatusCode());
-                    }
-                    return Mono.error(new ARCloudException(response.statusCode().value(), error));
-                })).bodyToMono(ptr).flatMap(locations -> Mono.just(new Locations(locations)));
+                .onStatus(statusCode -> statusCode.is5xxServerError(),
+                        response -> response.bodyToMono(String.class).flatMap(error -> {
+                            if (LOGGER.isDebugEnabled()) {
+                                LOGGER.log(Level.DEBUG, "5xx error occured: {} ({})", error, response.statusCode());
+                            }
+                            return Mono.error(new ARCloudException(response.statusCode().value(), error));
+                        }))
+                .bodyToMono(ptr).flatMap(locations -> Mono.just(new Locations(locations)));
 
         if (retry != null) {
             result = result.retryWhen(context != null ? retry.withRetryContext(Context.of(context)) : retry);
@@ -212,20 +213,21 @@ public class VehicleClient implements ARCloudClient<VehicleRequest<?>, VehicleRe
 
         Mono<VehicleResult> result = webClient.post().uri(region).accept(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromMultipartData(builder.build())).retrieve()
-                .onStatus(HttpStatus::is4xxClientError, response -> response.bodyToMono(String.class).flatMap(error -> {
-                    if (LOGGER.isDebugEnabled()) {
-                        LOGGER.log(Level.DEBUG, "4xx error occured: {} ({} - {})", error, response.statusCode(),
-                                response.rawStatusCode());
-                    }
-                    return Mono.error(new ARCloudException(response.rawStatusCode(), error));
-                }))
-                .onStatus(HttpStatus::is5xxServerError, response -> response.bodyToMono(String.class).flatMap(error -> {
-                    if (LOGGER.isDebugEnabled()) {
-                        LOGGER.log(Level.DEBUG, "5xx error occured: {} ({} - {})", error, response.statusCode(),
-                                response.rawStatusCode());
-                    }
-                    return Mono.error(new ARCloudException(response.statusCode().value(), error));
-                })).toEntity(VehicleResult.class).flatMap(entity -> {
+                .onStatus(statusCode -> statusCode.is4xxClientError(),
+                        response -> response.bodyToMono(String.class).flatMap(error -> {
+                            if (LOGGER.isDebugEnabled()) {
+                                LOGGER.log(Level.DEBUG, "4xx error occured: {} ({})", error, response.statusCode());
+                            }
+                            return Mono.error(new ARCloudException(response.statusCode().value(), error));
+                        }))
+                .onStatus(statusCode -> statusCode.is5xxServerError(),
+                        response -> response.bodyToMono(String.class).flatMap(error -> {
+                            if (LOGGER.isDebugEnabled()) {
+                                LOGGER.log(Level.DEBUG, "5xx error occured: {} ({})", error, response.statusCode());
+                            }
+                            return Mono.error(new ARCloudException(response.statusCode().value(), error));
+                        }))
+                .toEntity(VehicleResult.class).flatMap(entity -> {
                     VehicleResult vr = entity.getBody();
                     if (vr != null) {
                         vr.setRequestId(entity.getHeaders().getFirst("x-amzn-requestid"));
