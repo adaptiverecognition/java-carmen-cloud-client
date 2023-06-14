@@ -1,6 +1,21 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+/**
+ * Cloud API Client Java reference implementation.
+
+ * License: Apache License 2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * This file is part of the Adaptive Recognition Hungary Kft. 
+ * Vehicle API and Transportation&Cargo API Client Java reference implementation.
+ * 
+ * This software is free to use in either commercial or non-commercial applications.
+ * 
+ * This software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ * CONDITIONS OF ANY KIND, either express or implied.
+ * 
+ * Adaptive Recognition Hungary Kft.
+ * H-1023 Budapest, Alkotas u. 41. Hungary
+ * Web: https://adaptiverecognition.com/contact-us/
+ * 
  */
 package com.adaptiverecognition.cloud.client;
 
@@ -13,7 +28,6 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
@@ -30,10 +44,11 @@ import reactor.util.context.Context;
 import reactor.util.retry.RetryBackoffSpec;
 
 /**
+ * The client for the Transportation &amp; Cargo API.
  *
  * @author laszlo.toth
  */
-public class TransportClient implements ARCloudClient<TransportRequest<?>, TransportResult> {
+public class TransportClient implements CarmenCloudClient<TransportRequest<?>, TransportResult> {
 
     private static final Logger LOGGER = LogManager.getLogger(TransportClient.class);
 
@@ -61,10 +76,13 @@ public class TransportClient implements ARCloudClient<TransportRequest<?>, Trans
     }
 
     /**
+     * <p>
+     * Searches for ocr codes based on the request.
+     * </p>
      *
-     * @param request
-     * @return
-     * @throws ARCloudException
+     * @param request the request
+     * @return the result
+     * @throws ARCloudException if any error occurs
      */
     @Override
     public TransportResult search(TransportRequest<?> request) throws ARCloudException {
@@ -72,11 +90,14 @@ public class TransportClient implements ARCloudClient<TransportRequest<?>, Trans
     }
 
     /**
+     * <p>
+     * Searches for ocr codes based on the request with a retry context.
+     * </p>
      *
-     * @param request
-     * @param context
-     * @return
-     * @throws ARCloudException
+     * @param request the request
+     * @param context the retry context
+     * @return the result
+     * @throws ARCloudException if any error occurs
      */
     @Override
     public TransportResult search(TransportRequest<?> request, Map<?, ?> context) throws ARCloudException {
@@ -89,21 +110,13 @@ public class TransportClient implements ARCloudClient<TransportRequest<?>, Trans
         }
     }
 
-    /**
-     *
-     * @param request
-     * @return
-     */
+    /** {@inheritDoc} */
     @Override
     public CompletableFuture<TransportResult> searchAsync(TransportRequest<?> request) throws ARCloudException {
         return searchAsync(request, null);
     }
 
-    /**
-     *
-     * @param request
-     * @return
-     */
+    /** {@inheritDoc} */
     @Override
     public CompletableFuture<TransportResult> searchAsync(TransportRequest<?> request, Map<?, ?> context)
             throws ARCloudException {
@@ -158,35 +171,19 @@ public class TransportClient implements ARCloudClient<TransportRequest<?>, Trans
     }
 
     /**
-     *
+     * Creates a new client builder for the Transportation &amp; Cargo API.
      */
-    public static class TransportClientBuilder extends ARCloudClientBuilder<TransportRequest<?>, TransportResult> {
+    public static class TransportClientBuilder extends CarmenCloudClientBuilder<TransportRequest<?>, TransportResult> {
 
-        /**
-         *
-         */
         private final ThreadLocal<Boolean> disableImageResizing = new ThreadLocal<>();
-
-        /**
-         *
-         */
         private final ThreadLocal<Boolean> enableWideRangeAnalysis = new ThreadLocal<>();
-
-        /**
-         *
-         */
         private final ThreadLocal<Boolean> disableChecksumCheck = new ThreadLocal<>();
-
-        /**
-        *
-        */
         private final ThreadLocal<Boolean> enableFullUsAccrCode = new ThreadLocal<>();
-
-        /**
-         *
-         */
         private final ThreadLocal<Boolean> disableIsoCode = new ThreadLocal<>();
 
+        /**
+         * Default constructor.
+         */
         public TransportClientBuilder() {
             this.disableImageResizing.set(false);
             this.enableWideRangeAnalysis.set(false);
@@ -195,30 +192,37 @@ public class TransportClient implements ARCloudClient<TransportRequest<?>, Trans
             this.disableIsoCode.set(false);
         }
 
+        /** {@inheritDoc} */
         @Override
         public TransportClientBuilder endpoint(String endpoint) {
             return (TransportClientBuilder) super.endpoint(endpoint);
         }
 
+        /** {@inheritDoc} */
         @Override
         public TransportClientBuilder apiKey(String apiKey) {
             return (TransportClientBuilder) super.apiKey(apiKey);
         }
 
+        /** {@inheritDoc} */
         @Override
         public TransportClientBuilder responseTimeout(Long responseTimeout) {
             return (TransportClientBuilder) super.responseTimeout(responseTimeout);
         }
 
+        /** {@inheritDoc} */
         @Override
         public TransportClientBuilder retry(RetryBackoffSpec retry) {
             return (TransportClientBuilder) super.retry(retry);
         }
 
         /**
-         *
-         * @param disableImageResizing
-         * @return
+         * <p>
+         * Sets if image resizing should be disabled or not.
+         * </p>
+         * 
+         * @param disableImageResizing if image resizing should be disabled or not
+         * @return the builder
          */
         public TransportClientBuilder disableImageResizing(boolean disableImageResizing) {
             this.disableImageResizing.set(disableImageResizing);
@@ -226,17 +230,23 @@ public class TransportClient implements ARCloudClient<TransportRequest<?>, Trans
         }
 
         /**
+         * <p>
+         * Returns if image resizing is disabled or not.
+         * </p>
          *
-         * @return
+         * @return if image resizing is disabled or not
          */
         public boolean disableImageResizing() {
             return this.disableImageResizing.get();
         }
 
         /**
+         * <p>
+         * Sets if wide range analysis should be enabled or not.
+         * </p>
          *
-         * @param enableWideRangeAnalysis
-         * @return
+         * @param enableWideRangeAnalysis if wide range analysis should be enabled or
+         * @return the builder
          */
         public TransportClientBuilder enableWideRangeAnalysis(boolean enableWideRangeAnalysis) {
             this.enableWideRangeAnalysis.set(enableWideRangeAnalysis);
@@ -244,17 +254,23 @@ public class TransportClient implements ARCloudClient<TransportRequest<?>, Trans
         }
 
         /**
+         * <p>
+         * Returns if wide range analysis is enabled or not.
+         * </p>
          *
-         * @return
+         * @return if wide range analysis is enabled or not
          */
         public boolean enableWideRangeAnalysis() {
             return this.enableWideRangeAnalysis.get();
         }
 
         /**
+         * <p>
+         * Sets if checksum check should be disabled or not.
+         * </p>
          *
-         * @param disableChecksumCheck
-         * @return
+         * @param disableChecksumCheck if checksum check should be disabled or not
+         * @return the builder
          */
         public TransportClientBuilder disableChecksumCheck(boolean disableChecksumCheck) {
             this.disableChecksumCheck.set(disableChecksumCheck);
@@ -262,17 +278,23 @@ public class TransportClient implements ARCloudClient<TransportRequest<?>, Trans
         }
 
         /**
+         * <p>
+         * Returns if checksum check is disabled or not.
+         * </p>
          *
-         * @return
+         * @return if checksum check is disabled or not
          */
         public boolean disableChecksumCheck() {
             return this.disableChecksumCheck.get();
         }
 
         /**
+         * <p>
+         * Sets if full US Accr Code should be enabled or not.
+         * </p>
          *
-         * @param enableFullUsAccrCode
-         * @return
+         * @param enableFullUsAccrCode if full US Accr Code should be enabled or not
+         * @return the builder
          */
         public TransportClientBuilder enableFullUsAccrCode(boolean enableFullUsAccrCode) {
             this.enableFullUsAccrCode.set(enableFullUsAccrCode);
@@ -280,17 +302,23 @@ public class TransportClient implements ARCloudClient<TransportRequest<?>, Trans
         }
 
         /**
+         * <p>
+         * Returns if full US Accr Code is enabled or not.
+         * </p>
          *
-         * @return
+         * @return if full US Accr Code is enabled or not
          */
         public boolean enableFullUsAccrCode() {
             return this.enableFullUsAccrCode.get();
         }
 
         /**
+         * <p>
+         * Sets if ISO code should be disabled or not.
+         * </p>
          *
-         * @param disableIsoCode
-         * @return
+         * @param disableIsoCode if ISO code should be disabled or not
+         * @return the builder
          */
         public TransportClientBuilder disableIsoCode(boolean disableIsoCode) {
             this.disableIsoCode.set(disableIsoCode);
@@ -298,13 +326,17 @@ public class TransportClient implements ARCloudClient<TransportRequest<?>, Trans
         }
 
         /**
+         * <p>
+         * Returns if ISO code is disabled or not.
+         * </p>
          *
-         * @return
+         * @return if ISO code is disabled or not
          */
         public boolean disableIsoCode() {
             return this.disableIsoCode.get();
         }
 
+        /** {@inheritDoc} */
         @Override
         public TransportClient build() {
             return new TransportClient(this);

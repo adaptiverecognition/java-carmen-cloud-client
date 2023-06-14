@@ -1,0 +1,30 @@
+project:
+  name: Carmen Cloud Client
+  description: Carmen Cloud Client
+  longDescription: Client library for Carmen Cloud APIs
+  links:
+    homepage: https://github.com/adaptiverecognition/carmen-cloud-client
+  authors:
+    - Laszlo Toth
+  license: APACHE-2.0
+  inceptionYear: 2020
+  stereotype: cli
+  java:
+    version: 17
+    groupId: com.adaptiverecognition
+    artifactId: carmen-cloud-client
+
+release:
+  github:
+    overwrite: true
+    changelog:
+      formatted: ALWAYS
+      preset: conventional-commits
+      contributors:
+        format: '- {{contributorName}}{{#contributorUsernameAsLink}} ({{.}}){{/contributorUsernameAsLink}}'
+
+distributions:
+  helloworld:
+    type: SINGLE_JAR
+    artifacts:
+      - path: target/{{distributionName}}-{{projectVersion}}.jar

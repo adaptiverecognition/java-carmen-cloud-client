@@ -1,6 +1,21 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+/**
+ * Cloud API Client Java reference implementation.
+
+ * License: Apache License 2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * This file is part of the Adaptive Recognition Hungary Kft. 
+ * Vehicle API and Transportation&Cargo API Client Java reference implementation.
+ * 
+ * This software is free to use in either commercial or non-commercial applications.
+ * 
+ * This software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ * CONDITIONS OF ANY KIND, either express or implied.
+ * 
+ * Adaptive Recognition Hungary Kft.
+ * H-1023 Budapest, Alkotas u. 41. Hungary
+ * Web: https://adaptiverecognition.com/contact-us/
+ * 
  */
 package com.adaptiverecognition.cloud.client;
 
@@ -16,7 +31,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
@@ -36,10 +50,11 @@ import reactor.util.context.Context;
 import reactor.util.retry.RetryBackoffSpec;
 
 /**
+ * The client for the Vehicle API.
  *
  * @author laszlo.toth
  */
-public class VehicleClient implements ARCloudClient<VehicleRequest<?>, VehicleResult> {
+public class VehicleClient implements CarmenCloudClient<VehicleRequest<?>, VehicleResult> {
 
     private static final Logger LOGGER = LogManager.getLogger(VehicleClient.class);
 
@@ -66,19 +81,25 @@ public class VehicleClient implements ARCloudClient<VehicleRequest<?>, VehicleRe
     }
 
     /**
+     * <p>
+     * Gets the available locations.
+     * </p>
      *
-     * @return
-     * @throws ARCloudException
+     * @return the locations
+     * @throws ARCloudException if an error occurs
      */
     public Locations getLocations() throws ARCloudException {
         return getLocations(null);
     }
 
     /**
+     * <p>
+     * Gets the available locations with a retry context.
+     * </p>
      *
-     * @param context
-     * @return
-     * @throws ARCloudException
+     * @param context the retry context
+     * @return the locations
+     * @throws ARCloudException if an error occurs
      */
     public Locations getLocations(Map<?, ?> context) throws ARCloudException {
         try {
@@ -96,17 +117,23 @@ public class VehicleClient implements ARCloudClient<VehicleRequest<?>, VehicleRe
     }
 
     /**
+     * <p>
+     * Gets the available locations asynchronously.
+     * </p>
      *
-     * @return
+     * @return the locations
      */
     public CompletableFuture<Locations> getLocationsAsync() {
         return getLocationsAsync(null);
     }
 
     /**
+     * <p>
+     * Gets the available locations asynchronously with a retry context.
+     * </p>
      *
-     * @param context
-     * @return
+     * @param context the retry context
+     * @return the locations
      */
     public CompletableFuture<Locations> getLocationsAsync(Map<?, ?> context) {
         ParameterizedTypeReference<List<Location>> ptr = new ParameterizedTypeReference<>() {
@@ -130,10 +157,13 @@ public class VehicleClient implements ARCloudClient<VehicleRequest<?>, VehicleRe
     }
 
     /**
+     * <p>
+     * Searches for vehicles (anpr, mmr, and adr informations) based on the request.
+     * </p>
      *
-     * @param request
-     * @return
-     * @throws ARCloudException
+     * @param request the request
+     * @return the result
+     * @throws ARCloudException if an error occurs
      */
     @Override
     public VehicleResult search(VehicleRequest<?> request) throws ARCloudException {
@@ -141,11 +171,15 @@ public class VehicleClient implements ARCloudClient<VehicleRequest<?>, VehicleRe
     }
 
     /**
+     * <p>
+     * Searches for vehicles (anpr, mmr, and adr informations) based on the request
+     * with a retry context.
+     * </p>
      *
-     * @param request
-     * @param context
-     * @return
-     * @throws ARCloudException
+     * @param request the request
+     * @param context the retry context
+     * @return the result
+     * @throws ARCloudException if an error occurs
      */
     @Override
     public VehicleResult search(VehicleRequest<?> request, Map<?, ?> context) throws ARCloudException {
@@ -163,22 +197,13 @@ public class VehicleClient implements ARCloudClient<VehicleRequest<?>, VehicleRe
         }
     }
 
-    /**
-     *
-     * @param request
-     * @return
-     */
+    /** {@inheritDoc} */
     @Override
     public CompletableFuture<VehicleResult> searchAsync(VehicleRequest<?> request) {
         return searchAsync(request, null);
     }
 
-    /**
-     *
-     * @param request
-     * @param context
-     * @return
-     */
+    /** {@inheritDoc} */
     @Override
     public CompletableFuture<VehicleResult> searchAsync(VehicleRequest<?> request, Map<?, ?> context) {
 
@@ -243,55 +268,54 @@ public class VehicleClient implements ARCloudClient<VehicleRequest<?>, VehicleRe
     }
 
     /**
-     *
+     * Creates a new client builder for the Vehicle API.
      */
-    public static class VehicleClientBuilder extends ARCloudClientBuilder<VehicleRequest<?>, VehicleResult> {
+    public static class VehicleClientBuilder extends CarmenCloudClientBuilder<VehicleRequest<?>, VehicleResult> {
 
-        /**
-         *
-         */
         private final ThreadLocal<Boolean> disableCallStatistics = new ThreadLocal<>();
-
-        /**
-         *
-         */
         private final ThreadLocal<Boolean> disableImageResizing = new ThreadLocal<>();
-
-        /**
-         *
-         */
         private final ThreadLocal<Boolean> enableWideRangeAnalysis = new ThreadLocal<>();
 
+        /**
+         * Default constructor.
+         */
         public VehicleClientBuilder() {
             this.disableCallStatistics.set(false);
             this.disableImageResizing.set(false);
             this.enableWideRangeAnalysis.set(false);
         }
 
+        /** {@inheritDoc} */
         @Override
         public VehicleClientBuilder endpoint(String endpoint) {
             return (VehicleClientBuilder) super.endpoint(endpoint);
         }
 
+        /** {@inheritDoc} */
         @Override
         public VehicleClientBuilder apiKey(String apiKey) {
             return (VehicleClientBuilder) super.apiKey(apiKey);
         }
 
+        /** {@inheritDoc} */
         @Override
         public VehicleClientBuilder responseTimeout(Long responseTimeout) {
             return (VehicleClientBuilder) super.responseTimeout(responseTimeout);
         }
 
+        /** {@inheritDoc} */
         @Override
         public VehicleClientBuilder retry(RetryBackoffSpec retry) {
             return (VehicleClientBuilder) super.retry(retry);
         }
 
         /**
+         * <p>
+         * Sets if call statistics should be disabled. Default is false.
+         * </p>
          *
-         * @param disableCallStatistics
-         * @return
+         * @param disableCallStatistics if call statistics should be disabled
+         * @return the builder
          */
         public VehicleClientBuilder disableCallStatistics(boolean disableCallStatistics) {
             this.disableCallStatistics.set(disableCallStatistics);
@@ -299,17 +323,23 @@ public class VehicleClient implements ARCloudClient<VehicleRequest<?>, VehicleRe
         }
 
         /**
+         * <p>
+         * Returns if call statistics are disabled.
+         * </p>
          *
-         * @return
+         * @return if call statistics are disabled
          */
         public boolean disableCallStatistics() {
             return this.disableCallStatistics.get();
         }
 
         /**
+         * <p>
+         * Sets if image resizing should be disabled. Default is false.
+         * </p>
          *
-         * @param disableImageResizing
-         * @return
+         * @param disableImageResizing if image resizing should be disabled
+         * @return the builder
          */
         public VehicleClientBuilder disableImageResizing(boolean disableImageResizing) {
             this.disableImageResizing.set(disableImageResizing);
@@ -317,17 +347,23 @@ public class VehicleClient implements ARCloudClient<VehicleRequest<?>, VehicleRe
         }
 
         /**
+         * <p>
+         * Returns if image resizing is disabled.
+         * </p>
          *
-         * @return
+         * @return if image resizing is disabled
          */
         public boolean disableImageResizing() {
             return this.disableImageResizing.get();
         }
 
         /**
+         * <p>
+         * Sets if wide range analysis should be enabled. Default is false.
+         * </p>
          *
-         * @param enableWideRangeAnalysis
-         * @return
+         * @param enableWideRangeAnalysis if wide range analysis should be enabled
+         * @return the builder
          */
         public VehicleClientBuilder enableWideRangeAnalysis(boolean enableWideRangeAnalysis) {
             this.enableWideRangeAnalysis.set(enableWideRangeAnalysis);
@@ -335,13 +371,17 @@ public class VehicleClient implements ARCloudClient<VehicleRequest<?>, VehicleRe
         }
 
         /**
+         * <p>
+         * Returns if wide range analysis is enabled.
+         * </p>
          *
-         * @return
+         * @return if wide range analysis is enabled
          */
         public boolean enableWideRangeAnalysis() {
             return this.enableWideRangeAnalysis.get();
         }
 
+        /** {@inheritDoc} */
         @Override
         public VehicleClient build() {
             return new VehicleClient(this);
