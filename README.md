@@ -21,7 +21,7 @@ To depend on this project in Apache Maven, add the following to your pom.xml fil
     <dependency>
         <groupId>com.adaptiverecognition</groupId>
         <artifactId>carmen-cloud-client</artifactId>
-        <version>4.3.0</version>
+        <version>4.4.0</version>
     </dependency>
 </dependencies>
 ```
