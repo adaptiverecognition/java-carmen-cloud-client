@@ -34,7 +34,7 @@ import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import com.adaptiverecognition.cloud.ARCloudException;
+import com.adaptiverecognition.cloud.CarmenCloudException;
 import com.adaptiverecognition.cloud.transport.TransportRequest;
 import com.adaptiverecognition.cloud.transport.TransportResult;
 
@@ -48,7 +48,7 @@ import reactor.util.retry.RetryBackoffSpec;
  *
  * @author laszlo.toth
  */
-public class TransportClient implements CarmenCloudClient<TransportRequest<?>, TransportResult> {
+public class TransportClient implements CarmenCloudClient<TransportRequest, TransportResult> {
 
     private static final Logger LOGGER = LogManager.getLogger(TransportClient.class);
 
@@ -82,10 +82,10 @@ public class TransportClient implements CarmenCloudClient<TransportRequest<?>, T
      *
      * @param request the request
      * @return the result
-     * @throws ARCloudException if any error occurs
+     * @throws CarmenCloudException if any error occurs
      */
     @Override
-    public TransportResult search(TransportRequest<?> request) throws ARCloudException {
+    public TransportResult search(TransportRequest request) throws CarmenCloudException {
         return search(request, null);
     }
 
@@ -97,29 +97,29 @@ public class TransportClient implements CarmenCloudClient<TransportRequest<?>, T
      * @param request the request
      * @param context the retry context
      * @return the result
-     * @throws ARCloudException if any error occurs
+     * @throws CarmenCloudException if any error occurs
      */
     @Override
-    public TransportResult search(TransportRequest<?> request, Map<?, ?> context) throws ARCloudException {
+    public TransportResult search(TransportRequest request, Map<?, ?> context) throws CarmenCloudException {
         try {
             return searchAsync(request, context).get();
         } catch (InterruptedException | ExecutionException e) {
             // Restore interrupted state...
             Thread.currentThread().interrupt();
-            throw new ARCloudException(500, e.getMessage(), e);
+            throw new CarmenCloudException(500, e.getMessage(), e);
         }
     }
 
     /** {@inheritDoc} */
     @Override
-    public CompletableFuture<TransportResult> searchAsync(TransportRequest<?> request) throws ARCloudException {
+    public CompletableFuture<TransportResult> searchAsync(TransportRequest request) throws CarmenCloudException {
         return searchAsync(request, null);
     }
 
     /** {@inheritDoc} */
     @Override
-    public CompletableFuture<TransportResult> searchAsync(TransportRequest<?> request, Map<?, ?> context)
-            throws ARCloudException {
+    public CompletableFuture<TransportResult> searchAsync(TransportRequest request, Map<?, ?> context)
+            throws CarmenCloudException {
 
         MultipartBodyBuilder builder = new MultipartBodyBuilder();
         if (request.getInputImages() != null) {
@@ -146,14 +146,14 @@ public class TransportClient implements CarmenCloudClient<TransportRequest<?>, T
                             if (LOGGER.isDebugEnabled()) {
                                 LOGGER.log(Level.DEBUG, "4xx error occured: {} ({})", error, response.statusCode());
                             }
-                            return Mono.error(new ARCloudException(response.statusCode().value(), error));
+                            return Mono.error(new CarmenCloudException(response.statusCode().value(), error));
                         }))
                 .onStatus(statusCode -> statusCode.is5xxServerError(),
                         response -> response.bodyToMono(String.class).flatMap(error -> {
                             if (LOGGER.isDebugEnabled()) {
                                 LOGGER.log(Level.DEBUG, "5xx error occured: {} ({})", error, response.statusCode());
                             }
-                            return Mono.error(new ARCloudException(response.statusCode().value(), error));
+                            return Mono.error(new CarmenCloudException(response.statusCode().value(), error));
                         }))
                 .toEntity(TransportResult.class).flatMap(entity -> {
                     TransportResult vr = entity.getBody();
@@ -173,7 +173,7 @@ public class TransportClient implements CarmenCloudClient<TransportRequest<?>, T
     /**
      * Creates a new client builder for the Transportation &amp; Cargo API.
      */
-    public static class TransportClientBuilder extends CarmenCloudClientBuilder<TransportRequest<?>, TransportResult> {
+    public static class TransportClientBuilder extends CarmenCloudClientBuilder<TransportRequest, TransportResult> {
 
         private final ThreadLocal<Boolean> disableImageResizing = new ThreadLocal<>();
         private final ThreadLocal<Boolean> enableWideRangeAnalysis = new ThreadLocal<>();

@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.adaptiverecognition</groupId>
     <artifactId>carmen-cloud-client</artifactId>
-    <version>4.2.0-SNAPSHOT</version>
+    <version>4.4.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>Carmen Cloud Client</name>
     <description>Client package for Carmen Cloud</description>
@@ -42,25 +42,8 @@
             </roles>
         </developer>
     </developers>
-    <distributionManagement>
-        <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-    </distributionManagement>
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.sonatype.plugins</groupId>
-                <artifactId>nexus-staging-maven-plugin</artifactId>
-                <version>1.6.13</version>
-                <extensions>true</extensions>
-                <configuration>
-                    <serverId>ossrh</serverId>
-                    <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
-                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -119,6 +102,37 @@
         </pluginManagement>
     </build>
     <profiles>
+        <profile>
+            <id>default</id>
+            <distributionManagement>
+                <snapshotRepository>
+                    <id>ossrh</id>
+                    <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+                </snapshotRepository>
+            </distributionManagement>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.sonatype.plugins</groupId>
+                        <artifactId>nexus-staging-maven-plugin</artifactId>
+                        <version>1.6.13</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <serverId>ossrh</serverId>
+                            <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
+                            <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+            <dependencies>
+                <dependency>
+                    <groupId>com.adaptiverecognition</groupId>
+                    <artifactId>carmen-cloud-api</artifactId>
+                    <version>4.4.0-SNAPSHOT</version>
+                </dependency>
+            </dependencies>
+        </profile>
         <profile>
             <id>release</id>
             <build>
@@ -181,17 +195,7 @@
                 <dependency>
                     <groupId>com.adaptiverecognition</groupId>
                     <artifactId>cloud-api</artifactId>
-                    <version>4.2.0</version>
-                </dependency>
-            </dependencies>
-        </profile>
-        <profile>
-            <id>default</id>
-            <dependencies>
-                <dependency>
-                    <groupId>com.adaptiverecognition</groupId>
-                    <artifactId>carmen-cloud-api</artifactId>
-                    <version>4.2.1-SNAPSHOT</version>
+                    <version>4.4.0</version>
                 </dependency>
             </dependencies>
         </profile>

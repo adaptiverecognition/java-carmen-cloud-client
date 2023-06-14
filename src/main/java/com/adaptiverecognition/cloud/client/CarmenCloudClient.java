@@ -22,7 +22,7 @@ package com.adaptiverecognition.cloud.client;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-import com.adaptiverecognition.cloud.ARCloudException;
+import com.adaptiverecognition.cloud.CarmenCloudException;
 import com.adaptiverecognition.cloud.Request;
 import com.adaptiverecognition.cloud.Result;
 
@@ -43,9 +43,9 @@ public interface CarmenCloudClient<R extends Request<?>, A extends Result> {
      *
      * @param request the request
      * @return the result
-     * @throws ARCloudException if the request fails
+     * @throws CarmenCloudException if the request fails
      */
-    public A search(R request) throws ARCloudException;
+    public A search(R request) throws CarmenCloudException;
 
     /**
      * <p>
@@ -56,9 +56,9 @@ public interface CarmenCloudClient<R extends Request<?>, A extends Result> {
      * @param context the retry context. See {@link reactor.util.context.Context}
      *                for more details.
      * @return the result
-     * @throws ARCloudException if the request fails
+     * @throws CarmenCloudException if the request fails
      */
-    public A search(R request, Map<?, ?> context) throws ARCloudException;
+    public A search(R request, Map<?, ?> context) throws CarmenCloudException;
 
     /**
      * <p>
@@ -67,9 +67,9 @@ public interface CarmenCloudClient<R extends Request<?>, A extends Result> {
      *
      * @param request the request
      * @return the result
-     * @throws ARCloudException if the request fails
+     * @throws CarmenCloudException if the request fails
      */
-    public CompletableFuture<A> searchAsync(R request) throws ARCloudException;
+    public CompletableFuture<A> searchAsync(R request) throws CarmenCloudException;
 
     /**
      * <p>
@@ -80,7 +80,7 @@ public interface CarmenCloudClient<R extends Request<?>, A extends Result> {
      * @param context the retry context. See {@link reactor.util.context.Context}
      *                for more details.
      * @return the result
-     * @throws ARCloudException if the request fails
+     * @throws CarmenCloudException if the request fails
      */
-    public CompletableFuture<A> searchAsync(R request, Map<?, ?> context) throws ARCloudException;
+    public CompletableFuture<A> searchAsync(R request, Map<?, ?> context) throws CarmenCloudException;
 }

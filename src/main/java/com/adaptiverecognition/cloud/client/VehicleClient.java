@@ -37,7 +37,7 @@ import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import com.adaptiverecognition.cloud.ARCloudException;
+import com.adaptiverecognition.cloud.CarmenCloudException;
 import com.adaptiverecognition.cloud.vehicle.Locations;
 import com.adaptiverecognition.cloud.vehicle.Locations.Location;
 import com.adaptiverecognition.cloud.vehicle.VehicleRequest;
@@ -54,7 +54,7 @@ import reactor.util.retry.RetryBackoffSpec;
  *
  * @author laszlo.toth
  */
-public class VehicleClient implements CarmenCloudClient<VehicleRequest<?>, VehicleResult> {
+public class VehicleClient implements CarmenCloudClient<VehicleRequest, VehicleResult> {
 
     private static final Logger LOGGER = LogManager.getLogger(VehicleClient.class);
 
@@ -86,9 +86,9 @@ public class VehicleClient implements CarmenCloudClient<VehicleRequest<?>, Vehic
      * </p>
      *
      * @return the locations
-     * @throws ARCloudException if an error occurs
+     * @throws CarmenCloudException if an error occurs
      */
-    public Locations getLocations() throws ARCloudException {
+    public Locations getLocations() throws CarmenCloudException {
         return getLocations(null);
     }
 
@@ -99,18 +99,18 @@ public class VehicleClient implements CarmenCloudClient<VehicleRequest<?>, Vehic
      *
      * @param context the retry context
      * @return the locations
-     * @throws ARCloudException if an error occurs
+     * @throws CarmenCloudException if an error occurs
      */
-    public Locations getLocations(Map<?, ?> context) throws ARCloudException {
+    public Locations getLocations(Map<?, ?> context) throws CarmenCloudException {
         try {
             return getLocationsAsync(context).get();
         } catch (InterruptedException | ExecutionException e) {
             // Restore interrupted state...
             Thread.currentThread().interrupt();
-            if (e.getCause() instanceof ARCloudException) {
-                throw (ARCloudException) e.getCause();
+            if (e.getCause() instanceof CarmenCloudException) {
+                throw (CarmenCloudException) e.getCause();
             } else {
-                throw new ARCloudException(500, e.getMessage(), e);
+                throw new CarmenCloudException(500, e.getMessage(), e);
             }
 
         }
@@ -145,7 +145,7 @@ public class VehicleClient implements CarmenCloudClient<VehicleRequest<?>, Vehic
                             if (LOGGER.isDebugEnabled()) {
                                 LOGGER.log(Level.DEBUG, "5xx error occured: {} ({})", error, response.statusCode());
                             }
-                            return Mono.error(new ARCloudException(response.statusCode().value(), error));
+                            return Mono.error(new CarmenCloudException(response.statusCode().value(), error));
                         }))
                 .bodyToMono(ptr).flatMap(locations -> Mono.just(new Locations(locations)));
 
@@ -163,10 +163,10 @@ public class VehicleClient implements CarmenCloudClient<VehicleRequest<?>, Vehic
      *
      * @param request the request
      * @return the result
-     * @throws ARCloudException if an error occurs
+     * @throws CarmenCloudException if an error occurs
      */
     @Override
-    public VehicleResult search(VehicleRequest<?> request) throws ARCloudException {
+    public VehicleResult search(VehicleRequest request) throws CarmenCloudException {
         return search(request, null);
     }
 
@@ -179,19 +179,19 @@ public class VehicleClient implements CarmenCloudClient<VehicleRequest<?>, Vehic
      * @param request the request
      * @param context the retry context
      * @return the result
-     * @throws ARCloudException if an error occurs
+     * @throws CarmenCloudException if an error occurs
      */
     @Override
-    public VehicleResult search(VehicleRequest<?> request, Map<?, ?> context) throws ARCloudException {
+    public VehicleResult search(VehicleRequest request, Map<?, ?> context) throws CarmenCloudException {
         try {
             return searchAsync(request, context).get();
         } catch (InterruptedException | ExecutionException e) {
             // Restore interrupted state...
             Thread.currentThread().interrupt();
-            if (e.getCause() instanceof ARCloudException) {
-                throw (ARCloudException) e.getCause();
+            if (e.getCause() instanceof CarmenCloudException) {
+                throw (CarmenCloudException) e.getCause();
             } else {
-                throw new ARCloudException(500, e.getMessage(), e);
+                throw new CarmenCloudException(500, e.getMessage(), e);
             }
 
         }
@@ -199,13 +199,13 @@ public class VehicleClient implements CarmenCloudClient<VehicleRequest<?>, Vehic
 
     /** {@inheritDoc} */
     @Override
-    public CompletableFuture<VehicleResult> searchAsync(VehicleRequest<?> request) {
+    public CompletableFuture<VehicleResult> searchAsync(VehicleRequest request) {
         return searchAsync(request, null);
     }
 
     /** {@inheritDoc} */
     @Override
-    public CompletableFuture<VehicleResult> searchAsync(VehicleRequest<?> request, Map<?, ?> context) {
+    public CompletableFuture<VehicleResult> searchAsync(VehicleRequest request, Map<?, ?> context) {
 
         MultipartBodyBuilder builder = new MultipartBodyBuilder();
         if (request.getServices() != null && !request.getServices().isEmpty()) {
@@ -243,14 +243,14 @@ public class VehicleClient implements CarmenCloudClient<VehicleRequest<?>, Vehic
                             if (LOGGER.isDebugEnabled()) {
                                 LOGGER.log(Level.DEBUG, "4xx error occured: {} ({})", error, response.statusCode());
                             }
-                            return Mono.error(new ARCloudException(response.statusCode().value(), error));
+                            return Mono.error(new CarmenCloudException(response.statusCode().value(), error));
                         }))
                 .onStatus(statusCode -> statusCode.is5xxServerError(),
                         response -> response.bodyToMono(String.class).flatMap(error -> {
                             if (LOGGER.isDebugEnabled()) {
                                 LOGGER.log(Level.DEBUG, "5xx error occured: {} ({})", error, response.statusCode());
                             }
-                            return Mono.error(new ARCloudException(response.statusCode().value(), error));
+                            return Mono.error(new CarmenCloudException(response.statusCode().value(), error));
                         }))
                 .toEntity(VehicleResult.class).flatMap(entity -> {
                     VehicleResult vr = entity.getBody();
@@ -270,7 +270,7 @@ public class VehicleClient implements CarmenCloudClient<VehicleRequest<?>, Vehic
     /**
      * Creates a new client builder for the Vehicle API.
      */
-    public static class VehicleClientBuilder extends CarmenCloudClientBuilder<VehicleRequest<?>, VehicleResult> {
+    public static class VehicleClientBuilder extends CarmenCloudClientBuilder<VehicleRequest, VehicleResult> {
 
         private final ThreadLocal<Boolean> disableCallStatistics = new ThreadLocal<>();
         private final ThreadLocal<Boolean> disableImageResizing = new ThreadLocal<>();

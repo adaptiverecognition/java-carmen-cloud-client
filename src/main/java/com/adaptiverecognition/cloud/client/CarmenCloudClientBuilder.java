@@ -23,7 +23,7 @@ import java.time.Duration;
 
 import org.springframework.web.reactive.function.client.WebClientRequestException;
 
-import com.adaptiverecognition.cloud.ARCloudException;
+import com.adaptiverecognition.cloud.CarmenCloudException;
 import com.adaptiverecognition.cloud.Request;
 import com.adaptiverecognition.cloud.Result;
 
@@ -76,6 +76,17 @@ public abstract class CarmenCloudClientBuilder<R extends Request<?>, A extends R
      */
     public static VehicleClient.VehicleClientBuilder vehicleClientBuilder() {
         return new VehicleClient.VehicleClientBuilder();
+    }
+
+    /**
+     * <p>
+     * Creates a transport client builder.
+     * </p>
+     *
+     * @return the builder
+     */
+    public static TransportClient.TransportClientBuilder transportClientBuilder() {
+        return new TransportClient.TransportClientBuilder();
     }
 
     /**
@@ -181,7 +192,7 @@ public abstract class CarmenCloudClientBuilder<R extends Request<?>, A extends R
      * </p>
      * <ul>
      * <li>{@link WebClientRequestException}</li>
-     * <li>{@link ARCloudException} with status code 429 or 5xx</li>
+     * <li>{@link CarmenCloudException} with status code 429 or 5xx</li>
      * </ul>
      * 
      * @return the default retry configuration
@@ -191,8 +202,8 @@ public abstract class CarmenCloudClientBuilder<R extends Request<?>, A extends R
             if (throwable instanceof WebClientRequestException) {
                 return true;
             }
-            if (throwable instanceof ARCloudException) {
-                int statusCode = ((ARCloudException) throwable).getStatusCode();
+            if (throwable instanceof CarmenCloudException) {
+                int statusCode = ((CarmenCloudException) throwable).getStatusCode();
                 return statusCode == 429 || statusCode >= 500;
             }
             return false;
