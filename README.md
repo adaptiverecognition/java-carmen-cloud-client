@@ -15,13 +15,13 @@ This compiles the client into your local maven repository.
 
 # Using the client
 
-To depend on this project in Apache Maven, add the following to your pom.xml file.
+To depend on this project in Apache Maven, add the following to your pom.xml file. (Always use the latest version if possible.)
 ```xml
 <dependencies>
     <dependency>
         <groupId>com.adaptiverecognition</groupId>
         <artifactId>carmen-cloud-client</artifactId>
-        <version>4.2.0</version>
+        <version>4.3.0</version>
     </dependency>
 </dependencies>
 ```
@@ -33,19 +33,19 @@ For more information on managing dependencies with Maven and publishing artifact
 # Developer Guide
 
 ## Creating a client
-To create a client, use the client builder. You can obtain an instance of the builder via a static factory method located in the `CarmenCloudClientBuilder` class.
+To create a client, use the client builder. You can obtain an instance of the builder via a static factory method located in the `CarmenCloudClientBuilder` class:
 
 ```java
 VehicleClient.VehicleClientBuilder vehicleClientBuilder = CarmenCloudClientBuilder.vehicleClientBuilder();
 ```
 
-Or
+or
 
 ```java
 TransportClient.TransportClientBuilder transportClientBuilder = CarmenCloudClientBuilder.transportClientBuilder();
 ```
 
-The builder exposes many fluent configuration methods that can be chained to configure an API client. Here's a simple example that sets a few optional configuration options and then builds the vehicle API client.
+The builder exposes many configuration methods that can be chained to configure an API client. Here's a simple example that sets a few optional configuration options and then builds the vehicle API client.
 ```java
 VehicleClient.VehicleClientBuilder vehicleClientBuilder = CarmenCloudClientBuilder.vehicleClientBuilder();
 VehicleClient client = vehicleClientBuilder
@@ -59,7 +59,7 @@ VehicleClient client = vehicleClientBuilder
 ```
 
 ## API key
-An API key must be provided for the client builder. After you obtain your API key on the [https://cloud.adaptiverecognition.com](Cloud Console), it can be set via the client builder. It is recommended to treat the API key as sensitive and not hard-code it in your source code.
+An API key must be provided for the client builder. After you obtain your API key on the [Cloud Console](https://cloud.adaptiverecognition.com), it can be set via the client builder. It is recommended to treat the API key as sensitive and not hard-code it in your source code.
 
 ```java
 VehicleClient client = CarmenCloudClientBuilder.vehicleClientBuilder()
@@ -70,7 +70,7 @@ VehicleClient client = CarmenCloudClientBuilder.vehicleClientBuilder()
 After it is configured, the API key is sent with every request made to the API endpoint via the `X-Api-Key` header.
 
 ## Making requests
-After a client is configured and created, you can make a request to the API endpoint. The request class has setters for any parameters and payload that are defined in the API. The response class exposes getters for the modeled payload.
+After a client is configured and created, you can make a request to the API endpoint. The request class has setters for any parameters and payload that are defined in the API. The response class exposes getters for the modelled payload.
 ```java
 VehicleClient client = CarmenCloudClientBuilder.vehicleClientBuilder()
     .endpoint("https://api.cloud.adaptiverecognition.com")
@@ -79,18 +79,43 @@ VehicleResult result = client.search(new VehicleRequest()
 	.region("eur")
 	.location("HUN")
 	.services(VehicleRequest.Service.ANPR,VehicleRequest.Service.MMR)
-	.image(new FileInputStream(new File("")).readAllBytes(), "test-image.jpg"));
+	.image(new FileInputStream(new File("<PATH-OF-INPUT-IMAGE>")).readAllBytes(), "test-image.jpg"));
+```
+
+## Making requests asynchronously
+The asynchronous methods of the clients returns `java.util.concurrent.CompletableFuture`.
+
+```java
+VehicleClient client = CarmenCloudClientBuilder.vehicleClientBuilder()
+    .endpoint("https://api.cloud.adaptiverecognition.com")
+    .apiKey("*****").build();
+VehicleResult result = client.searchAsync(new VehicleRequest()
+	.region("eur")
+	.location("HUN")
+	.services(VehicleRequest.Service.ANPR,VehicleRequest.Service.MMR)
+	.image(new FileInputStream(new File("<PATH-OF-INPUT-IMAGE>")).readAllBytes(), "test-image.jpg"))
+.whenComplete((result, throwable) -> {
+    if (throwable != null) {
+        // handling error
+    }
+    else {
+        // handling the result
+    }
+});
 ```
 
 ## Exception Handling
 
-The `CarmenCloudException` expose the status code the HTTP response for logging or debugging purposes.
+The API clients are using the Spring Reactive WebClient to make requests to the API endpoints, so the service exceptions and client exceptions can be handled separately. Client exceptions will be a subtype of `org.springframework.web.reactive.function.client.WebClientRequestException`, service exceptions will be a subtype of `CarmenCloudException`.
+
 ```java
 try {
     client.search(...);
+} catch(WebClientRequestException e) {
+    // handling client exceptions raised by the inner WebClient
 } catch(CarmenCloudException e) {
     int statusCode = e.getStatusCode();
-    // ...
+    // handling service exceptions
 }
 ```
 
