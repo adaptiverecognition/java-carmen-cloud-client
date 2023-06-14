@@ -194,7 +194,7 @@
             <dependencies>
                 <dependency>
                     <groupId>com.adaptiverecognition</groupId>
-                    <artifactId>cloud-api</artifactId>
+                    <artifactId>carmen-cloud-api</artifactId>
                     <version>4.4.0</version>
                 </dependency>
             </dependencies>
