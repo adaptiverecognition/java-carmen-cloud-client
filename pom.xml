@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.adaptiverecognition</groupId>
     <artifactId>carmen-cloud-client</artifactId>
-    <version>4.4.1-SNAPSHOT</version>
+    <version>4.4.2-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>Carmen Cloud Client</name>
     <description>Client package for Carmen Cloud</description>
@@ -128,7 +128,7 @@
                 <dependency>
                     <groupId>com.adaptiverecognition</groupId>
                     <artifactId>carmen-cloud-api</artifactId>
-                    <version>4.4.1-SNAPSHOT</version>
+                    <version>4.4.2-SNAPSHOT</version>
                 </dependency>
             </dependencies>
         </profile>
@@ -194,7 +194,7 @@
                 <dependency>
                     <groupId>com.adaptiverecognition</groupId>
                     <artifactId>carmen-cloud-api</artifactId>
-                    <version>4.4.0</version>
+                    <version>4.4.1</version>
                 </dependency>
             </dependencies>
         </profile>
