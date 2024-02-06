@@ -24,9 +24,8 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.MultipartBodyBuilder;
@@ -50,7 +49,7 @@ import reactor.util.retry.RetryBackoffSpec;
  */
 public class TransportClient implements CarmenCloudClient<TransportRequest, TransportResult> {
 
-    private static final Logger LOGGER = LogManager.getLogger(TransportClient.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TransportClient.class);
 
     private final RetryBackoffSpec retry;
     private final WebClient webClient;
@@ -144,14 +143,14 @@ public class TransportClient implements CarmenCloudClient<TransportRequest, Tran
                 .onStatus(statusCode -> statusCode.is4xxClientError(),
                         response -> response.bodyToMono(String.class).flatMap(error -> {
                             if (LOGGER.isDebugEnabled()) {
-                                LOGGER.log(Level.DEBUG, "4xx error occured: {} ({})", error, response.statusCode());
+                                LOGGER.debug("4xx error occured: {} ({})", error, response.statusCode());
                             }
                             return Mono.error(new CarmenCloudException(response.statusCode().value(), error));
                         }))
                 .onStatus(statusCode -> statusCode.is5xxServerError(),
                         response -> response.bodyToMono(String.class).flatMap(error -> {
                             if (LOGGER.isDebugEnabled()) {
-                                LOGGER.log(Level.DEBUG, "5xx error occured: {} ({})", error, response.statusCode());
+                                LOGGER.debug("5xx error occured: {} ({})", error, response.statusCode());
                             }
                             return Mono.error(new CarmenCloudException(response.statusCode().value(), error));
                         }))
