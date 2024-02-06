@@ -56,7 +56,7 @@ The builder exposes many configuration methods that can be chained to configure 
 ```java
 VehicleClient.VehicleClientBuilder vehicleClientBuilder = CarmenCloudClientBuilder.vehicleClientBuilder();
 VehicleClient client = vehicleClientBuilder
-    .endpoint("https://api.cloud.adaptiverecognition.com")
+    .endpoint("https://api.carmencloud.com")
     .apiKey("*****")
     .responseTimeout(10_000L)
     .retry(vehicleClientBuilder.defaultRetry())
@@ -67,7 +67,7 @@ VehicleClient client = vehicleClientBuilder
 
 ## API key
 
-An API key must be provided for the client builder. After you obtain your API key on the [Cloud Console](https://cloud.adaptiverecognition.com), it can be set via the client builder. It is recommended to treat the API key as sensitive and not hard-code it in your source code.
+An API key must be provided for the client builder. After you obtain your API key on the [Cloud Console](https://carmencloud.com/console), it can be set via the client builder. It is recommended to treat the API key as sensitive and not hard-code it in your source code.
 
 ```java
 VehicleClient client = CarmenCloudClientBuilder.vehicleClientBuilder()
@@ -83,7 +83,7 @@ After a client is configured and created, you can make a request to the API endp
 
 ```java
 VehicleClient client = CarmenCloudClientBuilder.vehicleClientBuilder()
-    .endpoint("https://api.cloud.adaptiverecognition.com")
+    .endpoint("https://api.carmencloud.com")
     .apiKey("*****").build();
 VehicleResult result = client.search(new VehicleRequest()
 	.region("eur")
@@ -98,7 +98,7 @@ The asynchronous methods of the clients returns `java.util.concurrent.Completabl
 
 ```java
 VehicleClient client = CarmenCloudClientBuilder.vehicleClientBuilder()
-    .endpoint("https://api.cloud.adaptiverecognition.com")
+    .endpoint("https://api.carmencloud.com")
     .apiKey("*****").build();
 VehicleResult result = client.searchAsync(new VehicleRequest()
 	.region("eur")
@@ -142,7 +142,7 @@ The easiest way to create a custom retry policy is to use the `reactor.util.retr
  * given OR if the HTTP response from the service has one of the provided status codes.
  */
 VehicleClient vehicleClient = CarmenCloudClientBuilder.vehicleClientBuilder()
-    .endpoint("https://api.cloud.adaptiverecognition.com")
+    .endpoint("https://api.carmencloud.com")
     .apiKey("*****")
     .responseTimeout(10_000L)
     .retry(Retry.backoff(3 /* retry count */, Duration.ofSeconds(1)).doBeforeRetry((rs) -> {
