@@ -1,12 +1,15 @@
 # Carmen Cloud Client
-The Carmen Cloud Client provides a convenient way to leverage the features of the Adaptive Recognition's Carmen Cloud platform. With the Carmen Cloud platform, you can extract the needed information from the uploaded images, such as license plate numbers, vehicle make and model, and vehicle identification numbers (VINs). 
+
+The Carmen Cloud Client provides a convenient way to leverage the features of the Adaptive Recognition's Carmen Cloud platform. With the Carmen Cloud platform, you can extract the needed information from the uploaded images, such as license plate numbers, vehicle make and model, and vehicle identification numbers (VINs).
 
 # Building the client
+
 Before proceeding, install a [JDK](https://jdk.java.net/archive/) (must be Java 17 or later) and [Apache Maven](https://maven.apache.org/install.html).
 
 Ensure `JAVA_HOME` is set correctly and the `mvn` executable is available on your PATH.
 
 Run the following command in a terminal/console.
+
 ```bash
 mvn clean install
 ```
@@ -16,23 +19,26 @@ This compiles the client into your local maven repository.
 # Using the client
 
 To depend on this project in Apache Maven, add the following to your pom.xml file. (Always use the latest version if possible.)
+
 ```xml
 <dependencies>
     <dependency>
         <groupId>com.adaptiverecognition</groupId>
         <artifactId>carmen-cloud-client</artifactId>
-        <version>4.4.0</version>
+        <version>4.5.0</version>
     </dependency>
 </dependencies>
 ```
 
 For more information on managing dependencies with Maven and publishing artifacts, see:
-* [https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html](https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html)
-* [http://central.sonatype.org/pages/ossrh-guide.html](http://central.sonatype.org/pages/ossrh-guide.html)
+
+- [https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html](https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html)
+- [http://central.sonatype.org/pages/ossrh-guide.html](http://central.sonatype.org/pages/ossrh-guide.html)
 
 # Developer Guide
 
 ## Creating a client
+
 To create a client, use the client builder. You can obtain an instance of the builder via a static factory method located in the `CarmenCloudClientBuilder` class:
 
 ```java
@@ -46,6 +52,7 @@ TransportClient.TransportClientBuilder transportClientBuilder = CarmenCloudClien
 ```
 
 The builder exposes many configuration methods that can be chained to configure an API client. Here's a simple example that sets a few optional configuration options and then builds the vehicle API client.
+
 ```java
 VehicleClient.VehicleClientBuilder vehicleClientBuilder = CarmenCloudClientBuilder.vehicleClientBuilder();
 VehicleClient client = vehicleClientBuilder
@@ -59,6 +66,7 @@ VehicleClient client = vehicleClientBuilder
 ```
 
 ## API key
+
 An API key must be provided for the client builder. After you obtain your API key on the [Cloud Console](https://cloud.adaptiverecognition.com), it can be set via the client builder. It is recommended to treat the API key as sensitive and not hard-code it in your source code.
 
 ```java
@@ -70,7 +78,9 @@ VehicleClient client = CarmenCloudClientBuilder.vehicleClientBuilder()
 After it is configured, the API key is sent with every request made to the API endpoint via the `X-Api-Key` header.
 
 ## Making requests
+
 After a client is configured and created, you can make a request to the API endpoint. The request class has setters for any parameters and payload that are defined in the API. The response class exposes getters for the modelled payload.
+
 ```java
 VehicleClient client = CarmenCloudClientBuilder.vehicleClientBuilder()
     .endpoint("https://api.cloud.adaptiverecognition.com")
@@ -83,6 +93,7 @@ VehicleResult result = client.search(new VehicleRequest()
 ```
 
 ## Making requests asynchronously
+
 The asynchronous methods of the clients returns `java.util.concurrent.CompletableFuture`.
 
 ```java
@@ -120,6 +131,7 @@ try {
 ```
 
 ## Retries
+
 Out of the box, the generated client retries on throttling and server errors (HTTP status code 429 and 500). If a different retry policy is desired, a custom one can be set via the client builder.
 
 The easiest way to create a custom retry policy is to use the `reactor.util.retry.Retry` class. It provides a declarative API to specify when and how to retry.
