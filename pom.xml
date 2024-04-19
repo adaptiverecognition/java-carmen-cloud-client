@@ -55,7 +55,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.3.0</version>
+                <version>3.4.0</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -136,7 +136,7 @@
                 <dependency>
                     <groupId>com.adaptiverecognition</groupId>
                     <artifactId>carmen-cloud-api</artifactId>
-                    <version>4.8.1-SNAPSHOT</version>
+                    <version>4.9.0-SNAPSHOT</version>
                 </dependency>
             </dependencies>
         </profile>
@@ -202,7 +202,7 @@
                 <dependency>
                     <groupId>com.adaptiverecognition</groupId>
                     <artifactId>carmen-cloud-api</artifactId>
-                    <version>4.8.1</version>
+                    <version>4.9.0</version>
                 </dependency>
             </dependencies>
         </profile>
@@ -222,7 +222,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>
-            <version>3.2.4</version>
+            <version>3.2.5</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.springframework.boot</groupId>
@@ -243,7 +243,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-log4j2</artifactId>
-            <version>3.2.4</version>
+            <version>3.2.5</version>
         </dependency>
         <dependency>
             <groupId>com.lmax</groupId>
