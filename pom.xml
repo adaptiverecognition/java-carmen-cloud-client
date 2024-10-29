@@ -93,6 +93,9 @@
                 <version>3.5.1</version>
                 <configuration>
                     <skipTests>${skipTests}</skipTests>
+                    <includes>
+                        <include>**/VehicleClientTestSuite.java</include>
+                    </includes>
                 </configuration>
             </plugin>
         </plugins>
