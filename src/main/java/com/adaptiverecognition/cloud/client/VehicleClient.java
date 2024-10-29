@@ -138,8 +138,8 @@ public class VehicleClient implements CarmenCloudClient<VehicleRequest, VehicleR
         ParameterizedTypeReference<List<Location>> ptr = new ParameterizedTypeReference<>() {
         };
 
-        Mono<Locations> result = webClient.get().uri("countries").accept(MediaType.APPLICATION_JSON).retrieve()
-                .onStatus(statusCode -> statusCode.is5xxServerError(),
+        Mono<Locations> result = webClient.get().uri(uriBuilder -> uriBuilder.pathSegment("countries").build())
+                .accept(MediaType.APPLICATION_JSON).retrieve().onStatus(statusCode -> statusCode.is5xxServerError(),
                         response -> response.bodyToMono(String.class).flatMap(error -> {
                             if (LOGGER.isDebugEnabled()) {
                                 LOGGER.debug("5xx error occured: {} ({})", error, response.statusCode());
@@ -232,14 +232,12 @@ public class VehicleClient implements CarmenCloudClient<VehicleRequest, VehicleR
         String region;
         if (request.getRegion() == null || request.getRegion().length() == 0) {
             region = "";
-        } else if (!request.getRegion().startsWith("/")) {
-            region = "/" + request.getRegion();
         } else {
             region = request.getRegion();
         }
 
-        Mono<VehicleResult> result = webClient.post().uri(region).accept(MediaType.APPLICATION_JSON)
-                .body(BodyInserters.fromMultipartData(builder.build())).retrieve()
+        Mono<VehicleResult> result = webClient.post().uri(uriBuilder -> uriBuilder.pathSegment(region).build())
+                .accept(MediaType.APPLICATION_JSON).body(BodyInserters.fromMultipartData(builder.build())).retrieve()
                 .onStatus(statusCode -> statusCode.is4xxClientError(),
                         response -> response.bodyToMono(String.class).flatMap(error -> {
                             if (LOGGER.isDebugEnabled()) {

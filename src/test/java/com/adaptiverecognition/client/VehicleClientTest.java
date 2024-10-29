@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Map;
 
+import org.junit.jupiter.api.Test;
+
 import com.adaptiverecognition.cloud.CarmenCloudException;
 import com.adaptiverecognition.cloud.client.VehicleClient;
 import com.adaptiverecognition.cloud.client.VehicleClient.VehicleClientBuilder;
@@ -13,32 +15,19 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
-// generate a test class for VehicleClient
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
-public class VehicleClientTest extends TestCase {
+public class VehicleClientTest {
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
     /**
      * Create the test case
      *
-     * @param testName name of the test case
      */
-    public VehicleClientTest(String testName) {
-        super(testName);
-    }
-
-    /**
-     * @return the suite of tests being tested
-     */
-    public static Test suite() {
-        return new TestSuite(VehicleClientTest.class);
+    public VehicleClientTest() {
     }
 
     /**
      */
+    @Test
     public void testApp() {
         String endpoint = System.getProperty("endpoint", "https://api.carmencloud.com/vehicle");
         String region = System.getProperty("region");
