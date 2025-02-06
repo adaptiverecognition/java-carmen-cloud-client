@@ -1,4 +1,4 @@
-image: gitlab.ar.local:5050/arcloud/docker-images/gitlab-runner:latest
+image: $GITLAB_CI_IMAGE
 
 variables:
   MAVEN_CLI_OPTS: "--batch-mode --update-snapshots"
